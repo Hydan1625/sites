@@ -10,6 +10,11 @@ let squares = [];
 let copy = [];
 let new_list = [];
 
+
+//switches
+
+let state_draw_lines = false;
+
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 window.addEventListener("mousemove", setMousePosition, true);
@@ -144,7 +149,7 @@ class object_contructor {
 				this.centerX = this.x + this.width * 0.5;
 				this.centerY = this.y + this.height * 0.5;
 
-				this.create_image(ctx);
+				//this.create_image(ctx);
 
 				break;
 
@@ -473,14 +478,7 @@ $create_circle.onclick = function () {
 	}
 	let random_speed = Math.floor(Math.random() * max_speed) + 1;
 
-	let random_circle = new object_contructor(
-		"circle",
-		random_x,
-		random_y,
-		random_speed,
-		"purple",
-		random_radius
-	);
+	let random_circle = new object_contructor("circle", random_x, random_y, random_speed, "purple", random_radius);
 	circles.push(random_circle);
 };
 
@@ -507,6 +505,9 @@ $delete_square.onclick = function () { squares.pop() };
 
 let $delete_circle = document.getElementById("delete_circle");
 $delete_circle.onclick = function () { circles.pop() };
+
+let $stop = document.getElementById("stop").addEventListener('click', stop_movement);
+let $start = document.getElementById("start").addEventListener('click', start_movement);
 
 //controlables
 
@@ -567,6 +568,39 @@ function draw_lines(list) {
 	});
 }
 
+
+function change_state(thing) {
+	if (thing === true) {
+		return thing = false
+	} else {
+		return thing = true
+	}
+}
+
+function stop_movement() {
+	squares.forEach(element => {
+		element.dx = element.dy = 0;
+	})
+	circles.forEach(element => {
+		element.dx = element.dy = 0;
+	})
+}
+
+function start_movement() {
+	let len1 = circles.length
+	let len2 = squares.length
+	circles.forEach(element => {
+		let random_speed = Math.floor(Math.random() * max_speed) + 1
+		element.dx = element.dy = random_speed
+	})
+	squares.forEach(element => {
+		let random_speed = Math.floor(Math.random() * max_speed) + 1
+		element.dx = element.dy = random_speed
+	})
+}
+
+
+
 //not working yet
 
 let $create_my_circle = document.getElementById("create_my_circle");
@@ -585,13 +619,18 @@ $create_my_circle.onclick = function () {
 };
 
 function game() {
-	//let $all_line = document.getElementById("show_all_line").addEventListener('click', );
+	//let $all_line = document.getElementById("show_all_line").addEventListener('click', !state_draw_lines);
 
 	my_circle.circle_square_response(squares);
 	my_circle.circle_response(circles);
 
+
+	
 	let new_list = squares.concat(circles);
-	draw_lines(new_list);
+	//draw_lines(new_list)
+	//state_draw_lines === true ? draw_lines(new_list) : 
+
+	//
 
 	$clear_canvas.onclick = () => { clear() };
 
@@ -622,3 +661,8 @@ let update_frame = function () {
 };
 
 update_frame();
+
+
+//colisioes formulas para elasticas
+//colisoes inelasticas
+//massa
