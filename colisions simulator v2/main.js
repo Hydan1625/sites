@@ -1,7 +1,7 @@
 //variables here
 
 let update_game_time = 1000 / 60;
-let max_size = 80;
+let max_size = 100;
 let max_quantity = 2;
 let my_circle_radius = 20;
 let max_speed = 12;
@@ -9,6 +9,9 @@ let circles = [];
 let squares = [];
 let copy = [];
 let new_list = [];
+let lines_toggle = false;
+let square_toggle = false;
+let circle_toggle = false;
 
 
 //switches
@@ -53,21 +56,28 @@ class object_contructor {
 		this.text = 0;
 		this.dx = 2 * this.speed;
 		this.dy = this.speed;
-		this.image_path = "792632.png";
+		this.dxv = this.speed * 2;
+		this.dyv = this.speed;
+		//this.old_speed = this.speed;
+		//this.image_path = "792632.png";
 
 		if (this.type === "square") {
 			this.width = width;
 			this.height = height;
+			this.mass = ((this.width * this.height) * 0.01) * 0.12;
 
 			this.centerX = this.x + this.width * 0.5;
 			this.centerY = this.y + this.height * 0.5;
 
 		} else if (this.type == "circle") {
 			this.radius = radius;
+			this.mass = ((this.radius * (Math.PI ** 2)) * 0.01) * 0.12;
 
 			this.centerX = this.x;
 			this.centerY = this.y;
 		}
+
+		//this.speed = this.speed * this.mass
 	}
 
 	get bottom() { return this.y + this.height }
@@ -92,7 +102,7 @@ class object_contructor {
 				ctx.strokeStyle = this.color;
 
 				ctx.fillStyle = this.color;
-				//ctx.fillRect(this.x, this.y, this.width, this.height);
+				ctx.fillRect(this.x, this.y, this.width, this.height);
 				ctx.rect(this.x, this.y, this.width, this.height);
 				ctx.stroke();
 				ctx.closePath();
@@ -112,7 +122,7 @@ class object_contructor {
 				ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
 				ctx.stroke();
 				ctx.fillStyle = this.color;
-				//ctx.fill();
+				ctx.fill();
 				ctx.closePath();
 				break;
 		}
@@ -169,6 +179,7 @@ class object_contructor {
 
 				this.centerX = this.x;
 				this.centerY = this.y;
+
 		}
 
 		this.x += this.dx;
@@ -227,15 +238,28 @@ class object_contructor {
 		}
 	}
 
-	invert_velocities(circle) {
-		if (this.circle_colision(circle)) {
-			this.dx = -this.dx;
-			circle.dx = -circle.dx;
-
-			this.dy = -this.dy;
-			circle.dy = -circle.dy;
+	/*
+	reduce_dx(element) {
+		if (this.dx >= max_speed) { this.dx = max_speed }
+		if (this.dx <= -max_speed) { this.dx = -max_speed }
+		if (element.dx >= max_speed) { element.dx = max_speed }
+		if (element.dx <= -max_speed) { element.dx = -max_speed }
+		else {
+			this.dx < 0 ? this.dx += element.mass : this.dx -= element.mass;
+			element.dx < 0 ? element.dx += this.mass : element.dx += this.mass;
 		}
 	}
+
+	reduce_dy(element) {
+		if (this.dy >= max_speed) { this.dy = max_speed }
+		if (this.dy <= -max_speed) { this.dy = -max_speed }
+		if (element.dy >= max_speed) { element.dy = max_speed }
+		if (element.dy <= -max_speed) { element.dy = -max_speed }
+		else {
+			this.dy < 0 ? this.dy += element.mass : this.dy -= element.mass
+			element.dy < 0 ? element.dy += this.mass : element.dy += this.mass
+		}
+	}*/
 
 	square_response(values) {
 		//colision_response_with_squares
@@ -254,21 +278,25 @@ class object_contructor {
 						if (vector_y > 0) {
 							this.y = element.bottom;
 							element.dy = -element.dy;
+							//this.reduce_dy(element);
 						} else {
 							this.y = element.y - this.height;
 							element.dy = -element.dy;
+							//this.reduce_dy(element);
 						}
 					} else {
 						if (vector_x > 0) {
 							this.x = element.right;
 							element.dx = -element.dx;
+							//this.reduce_dx(element);
 						} else {
 							this.x = element.x - this.width;
 							element.dx = -element.dx;
+							//this.reduce_dx(element);
 						}
 					}
-
 					//this.dx = element.dx = this.dy = element.dy = 0;
+
 				}
 			}
 
@@ -323,11 +351,13 @@ class object_contructor {
 								element.y = this.top - element.radius - 1;
 								this.dy = -this.dy;
 								element.dy = -element.dy;
+								//this.reduce_dy(element);
 							} else {
 								//this.y -= distance;
 								element.y = this.bottom + element.radius + 1;
 								this.dy = -this.dy;
 								element.dy = -element.dy;
+								//this.reduce_dy(element);
 							}
 						} else {
 							if (vectorX > 0) {
@@ -335,11 +365,13 @@ class object_contructor {
 								//this.x += distance;
 								this.dx = -this.dx;
 								element.dx = -element.dx;
+								//this.reduce_dx(element);
 							} else {
 								//this.x -= distance;
 								element.x = this.right + element.radius + 1;
 								this.dx = -this.dx;
 								element.dx = -element.dx;
+								//this.reduce_dx(element);
 							}
 						}
 					}
@@ -390,11 +422,13 @@ class object_contructor {
 								element.y = this.top - element.radius - 1;
 								this.dy = -this.dy;
 								element.dy = -element.dy;
+								//this.reduce_dy(element);
 							} else {
 								//this.y -= distance;
 								element.y = this.bottom + element.radius + 1;
 								this.dy = -this.dy;
 								element.dy = -element.dy;
+								//this.reduce_dy(element);
 							}
 						} else {
 							if (vectorX > 0) {
@@ -402,11 +436,13 @@ class object_contructor {
 								//this.x += distance;
 								this.dx = -this.dx;
 								element.dx = -element.dx;
+								//this.reduce_dx(element);
 							} else {
 								//this.x -= distance;
 								element.x = this.right + element.radius + 1;
 								this.dx = -this.dx;
 								element.dx = -element.dx;
+								//this.reduce_dx(element);
 							}
 						}
 
@@ -422,10 +458,12 @@ class object_contructor {
 			if (element.x == this.x && element.y == this.y) {
 				return;
 			} else {
-				let distanceX = this.x - element.x;
-				let distanceY = this.y - element.y;
 
 				if (this.circle_colision(element)) {
+
+					let distanceX = this.x - element.x;
+					let distanceY = this.y - element.y;
+
 					let radius_distance = this.radius + element.radius;
 					let distance =
 						radius_distance -
@@ -436,20 +474,24 @@ class object_contructor {
 							this.y += distance;
 							//this.dy = -this.dy;
 							element.dy = -element.dy;
+							//this.reduce_dy(element);
 						} else {
 							this.y -= distance;
 							//this.dy = -this.dy;
 							element.dy = -element.dy;
+							//this.reduce_dy(element);
 						}
 					} else {
 						if (distanceX < 0) {
 							this.x -= distance;
 							//this.dx = -this.dx;
 							element.dx = -element.dx;
+							//this.reduce_dx(element);
 						} else {
 							this.x += distance;
 							//this.dx = -this.dx;
 							element.dx = -element.dx;
+							//this.reduce_dx(element);
 						}
 					}
 
@@ -457,6 +499,7 @@ class object_contructor {
 						this.x += radius_distance;
 						this.y += radius_distance;
 					}
+
 
 					//this.dx = element.dx = this.dy = element.dy = 0
 				}
@@ -468,17 +511,24 @@ class object_contructor {
 //classes objects
 //buttons for creating stuff
 
+change_toggle_all = () => { return lines_toggle = !lines_toggle }
+change_toggle_square = () => {return square_toggle = !square_toggle }
+change_toggle_circle = () => { return circle_toggle = !circle_toggle }
+
+let $all_line = document.getElementById("show_all_line").addEventListener('click', change_toggle_all);
+let $square_line = document.getElementById("show_square_line").addEventListener('click', change_toggle_square);
+let $circle_line = document.getElementById("show_circle_line").addEventListener('click', change_toggle_circle);
+
 let $create_circle = document.getElementById("create_circle");
 $create_circle.onclick = function () {
 	let random_x = Math.floor(Math.random() * canvas.width) + 1;
 	let random_y = Math.floor(Math.random() * canvas.height) + 1;
 	let random_radius = Math.floor(Math.random() * max_size) + 1;
-	if (random_radius < 10) {
-		random_radius = 10;
-	}
+	if (random_radius < 20) { random_radius = 20 }
 	let random_speed = Math.floor(Math.random() * max_speed) + 1;
 
 	let random_circle = new object_contructor("circle", random_x, random_y, random_speed, "purple", random_radius);
+	random_circle.random_color();
 	circles.push(random_circle);
 };
 
@@ -489,14 +539,15 @@ $create_square.onclick = function () {
 	let random_y = Math.floor(Math.random() * canvas.height) + 1;
 
 	let random_width = Math.floor(Math.random() * max_size) + 1;
-	if (random_width < 10) { random_width = 10; }
+	if (random_width < 20) { random_width = 20; }
 
 	let random_height = Math.floor(Math.random() * max_size) + 1;
-	if (random_height < 10) { random_height = 10; }
+	if (random_height < 20) { random_height = 20 }
 
 	let random_speed = Math.floor(Math.random() * max_speed) + 1;
 
 	let random_square = new object_contructor("square", random_x, random_y, random_speed, "black", null, random_width, random_height);
+	random_square.random_color();
 	squares.push(random_square);
 };
 
@@ -511,8 +562,8 @@ let $start = document.getElementById("start").addEventListener('click', start_mo
 
 //controlables
 
-let my_square = new object_contructor("square", 0, 0, random_speed, "black", null, 100, 100);
-let my_circle = new object_contructor("circle", 0, 0, random_speed, "black", my_circle_radius);
+let my_square = new object_contructor("square", 0, 0, Math.floor(Math.random() * max_speed) + 1, "black", null, 100, 100);
+let my_circle = new object_contructor("circle", 0, 0, Math.floor(Math.random() * max_speed) + 1, "black", my_circle_radius);
 
 
 
@@ -521,13 +572,13 @@ let my_circle = new object_contructor("circle", 0, 0, random_speed, "black", my_
 
 function update_my_circle() {
 	my_circle.update();
-	my_circle = new Circle(mouseX, mouseY, my_circle_radius, "black", 0, 0);
+	//my_circle = new Circle(mouseX, mouseY, my_circle_radius, "black", 0, 0);
 	update_position(my_circle);
 }
 
 function update_my_square() {
 	my_square.update();
-	my_square = new object_contructor(mouseX, mouseY, 100, 100, 0);
+	//my_square = new object_contructor(mouseX, mouseY, 80, 80, 0);
 	update_position_square(my_square);
 }
 
@@ -563,40 +614,32 @@ function clear() {
 }
 
 function draw_lines(list) {
-	list.forEach((element) => {
+	for (element of list) {
 		element.draw_line(list);
-	});
+	};
 }
 
 
-function change_state(thing) {
-	if (thing === true) {
-		return thing = false
-	} else {
-		return thing = true
-	}
-}
 
 function stop_movement() {
-	squares.forEach(element => {
-		element.dx = element.dy = 0;
-	})
-	circles.forEach(element => {
-		element.dx = element.dy = 0;
-	})
+	for (square of squares) {
+		square.dx = square.dy = 0;
+	} for (circle of circles) {
+		circle.dx = circle.dy = 0;
+	}
 }
 
 function start_movement() {
 	let len1 = circles.length
 	let len2 = squares.length
-	circles.forEach(element => {
+	for (element of circles) {
 		let random_speed = Math.floor(Math.random() * max_speed) + 1
 		element.dx = element.dy = random_speed
-	})
-	squares.forEach(element => {
+	}
+	for (element of squares) {
 		let random_speed = Math.floor(Math.random() * max_speed) + 1
 		element.dx = element.dy = random_speed
-	})
+	}
 }
 
 
@@ -609,60 +652,54 @@ let $crete_my_square = document.getElementById("create_my_square");
 let $clear_canvas = document.getElementById("clear_all");
 
 $crete_my_square.onclick = function () {
-	let my_square = new object_contructor("square", mouseX, mouseY, random_speed, "black", 0, 100, 100);
+	let my_square = new object_contructor("square", mouseX, mouseY, random_speed, "black", 0, 80, 80);
+	my_square.random_color();
 	squares.push(my_square);
 };
 
 $create_my_circle.onclick = function () {
 	let my_circle = new object_contructor("circle", mouseX, mouseY, random_speed, "black", my_circle_radius);
+	my_circle.random_color();
 	circles.push(my_circle);
 };
 
+
+
 function game() {
-	//let $all_line = document.getElementById("show_all_line").addEventListener('click', !state_draw_lines);
 
 	my_circle.circle_square_response(squares);
 	my_circle.circle_response(circles);
 
-
-	
 	let new_list = squares.concat(circles);
 	//draw_lines(new_list)
-	//state_draw_lines === true ? draw_lines(new_list) : 
 
-	//
+	if (lines_toggle === true) { draw_lines(new_list) }
+	if (circle_toggle === true) {draw_lines(circles)}
+	if (square_toggle === true) {draw_lines(squares)}
+
 
 	$clear_canvas.onclick = () => { clear() };
 
 	squares.forEach((element) => {
+
 		element.square_response(squares);
 		element.circle_square_response(circles);
-
 		element.update();
 		//element.random_color();
-		//let $square_line = document.getElementById("show_square_line").addEventListener('click', desapear_lines());
 	});
 
 	circles.forEach((element) => {
-		element.circle_response(circles);
 
+		element.circle_response(circles);
 		element.update();
 		//element.random_color();
-		//let $circle_line = document.getElementById("show_circle_line").addEventListener('click', draw_lines_circles);
 	});
 }
 
 let update_frame = function () {
 	requestAnimationFrame(update_frame);
-
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-
 	game();
 };
 
 update_frame();
-
-
-//colisioes formulas para elasticas
-//colisoes inelasticas
-//massa
