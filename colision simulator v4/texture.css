@@ -1,0 +1,52 @@
+body {
+    background-color: rgba(121, 90, 223, 0.593);
+    font-family: sans-serif;
+}
+
+canvas {
+    float: left;
+    background-color: palevioletred;
+    border: 6px solid burlywood;
+    /*border-collapse: collapse;*/
+    border-radius: 10px;
+    /* width: 73%; */
+}
+
+.table {
+    /* float: right; */
+    background-color: #d87093;
+    /* height: 100%; */
+    border: 4px solid burlywood;
+    border-radius: 10px;
+    /* width: 25%; */
+}
+
+td {
+    /*border: 4px solid burlywood;
+    border-radius: 10px;*/
+    background-color: palevioletred;
+}
+
+button {
+    vertical-align: center;
+    border-radius: 10px;
+    background-color: rgb(166, 157, 229);
+    font-family: sans-serif;
+    /* font-size: small; */
+    width: 100%;
+    height: 100%;
+}
+
+/* .color_container {
+    width: 100%;
+    height: 260px;
+} */
+
+#color_value {
+    margin: auto;
+    border: 2px solid rgb(166, 157, 229);
+    border-radius: 10px;
+    display: block;
+    width: 100%;
+    /* height: 260px; */
+}
