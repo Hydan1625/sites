@@ -274,6 +274,12 @@ class object_contructor {
 	draw_line(object_or_array) {
 		object_or_array.forEach((element) => {
 			ctx.beginPath();
+
+			//remove this { //for stopping the lines to have shadows
+			ctx.shadowBlur = null;
+			ctx.shadowColor = null;
+			//}
+
 			ctx.moveTo(this.centerX, this.centerY);
 			ctx.lineTo(element.centerX, element.centerY);
 			ctx.lineWidth = 3;
