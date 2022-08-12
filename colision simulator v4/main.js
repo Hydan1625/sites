@@ -84,6 +84,7 @@ class object_contructor {
 		this.linew_width = 3;
 		this.shadow_color = "black";
 		this.shadow_blur = 20;
+		this.outline = false;
 
 		//this.image_path = "792632.png";
 
@@ -126,7 +127,7 @@ class object_contructor {
 
 		this.light_souce === true ? ctx.shadowColor = this.color : ctx.shadowColor = this.shadow_color;
 
-		
+
 
 		switch (this.type) {
 			case "square":
@@ -157,10 +158,12 @@ class object_contructor {
 				ctx.fillStyle = this.grd;
 				ctx.fillRect(this.x, this.y, this.width, this.height);
 
-				//ctx.strokeStyle = this.color;
-				//ctx.rect(this.x, this.y, this.width, this.height);
-				//ctx.stroke();
-				//ctx.fill();
+				if (this.outline === true) {
+					ctx.strokeStyle = this.color;
+					ctx.rect(this.x, this.y, this.width, this.height);
+					ctx.stroke();
+					//ctx.fill();
+				}
 				ctx.closePath();
 				break;
 
@@ -188,7 +191,7 @@ class object_contructor {
 				} else { this.grd = this.color }
 
 				ctx.fillStyle = this.grd;
-				//ctx.strokeStyle = this.color;
+				ctx.strokeStyle = this.color;
 
 				ctx.textAlign = "center";
 				ctx.textBaseline = "middle";
@@ -196,11 +199,15 @@ class object_contructor {
 				ctx.fillText(this.text, this.x, this.y);
 
 				ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-				//ctx.stroke();
-
 				ctx.fillStyle = this.grd;
-				ctx.fill();
 
+				if (this.outline === true) {			
+					ctx.stroke();
+					ctx.fill();
+				} else {
+					//ctx.stroke();
+					ctx.fill();
+				}
 				ctx.closePath();
 				break;
 		}
@@ -644,6 +651,10 @@ $delete_square.onclick = function () { squares.pop() };
 let $delete_circle = document.getElementById("delete_circle");
 $delete_circle.onclick = function () { circles.pop() };
 
+let $delete_light = document.getElementById("delete_light").onclick = () => {
+	light_sources.pop()
+}
+
 let $stop = document.getElementById("stop").addEventListener('click', stop_movement);
 let $start = document.getElementById("start").addEventListener('click', start_movement);
 
@@ -659,7 +670,7 @@ let my_light = new object_contructor("circle", mouseX, mouseY, 0, "white", 20)
 
 function update_my_circle(element) {
 	element.update();
-	
+
 	my_light = new object_contructor("circle", mouseX, mouseY, 0, "white", 30);
 	my_light.light_souce = true;
 	light_sources[0] = my_light;
@@ -748,6 +759,14 @@ function start_movement() {
 let $create_my_circle = document.getElementById("create_my_circle");
 let $crete_my_square = document.getElementById("create_my_square");
 let $create_my_light = document.getElementById('create_my_light');
+let $show_outline = document.getElementById("show_outline").onclick = () => {
+	circles.forEach(i => {
+		i.outline = !i.outline
+	});
+	squares.forEach(i => {
+		i.outline = !i.outline
+	});
+}
 
 let $clear_canvas = document.getElementById("clear_all");
 
@@ -773,7 +792,8 @@ function game() {
 
 	canvas.style.background = $color_picker.value;
 
-	update_my_circle(my_light);
+
+	//update_my_circle(my_light);
 
 	light_sources.forEach((element) => {
 
