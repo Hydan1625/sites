@@ -10,47 +10,33 @@ let squares = [];
 let light_sources = [];
 let copy = [];
 let new_list = [];
-let lines_toggle = false;
-let square_toggle = false;
-let circle_toggle = false;
+
 let background_color = "#d87093";
 
 
 //switches
 
 let state_draw_lines = false;
+let lines_toggle = false;
+let square_toggle = false;
+let circle_toggle = false;
+
+//canvas objects here
 
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
-window.addEventListener("mousemove", setMousePosition, true);
-window.addEventListener("resize", resizeing, true);
 
 canvas.width = innerWidth - 350; // -400
 canvas.height = innerHeight - 50; // -100
 
+//mouse objects here
+
+window.addEventListener("mousemove", setMousePosition, true);
+window.addEventListener("resize", resizeing, true);
+
 let mouseX = Math.floor(canvas.width / 2);
 let mouseY = Math.floor(canvas.height / 2);
 
-let random_x = Math.floor(Math.random() * canvas.width) + 1;
-let random_y = Math.floor(Math.random() * canvas.height) + 1;
-let random_radius = Math.floor(Math.random() * max_size) + 1;
-let random_speed = Math.floor(Math.random() * max_speed) + 1;
-
-//testes
-
-let $color_picker = document.getElementById('color_value');
-let $div_table = document.querySelector('.table');
-
-//manipulação de variavel aqui
-
-$div_table.style.height = canvas.height + "px";
-//$color_picker.style.height = $div_table - ($div_table * 0.35) + "px";
-$color_picker.value = background_color;
-
-
-let $reset_background = document.getElementById("reset_background").addEventListener('click', () => {
-	$color_picker.value = background_color;
-});
 
 function resizeing(event) {
 	canvas.width = innerWidth - 400;
@@ -63,24 +49,45 @@ function setMousePosition(event) {
 	mouseY = event.clientY;
 }
 
+//random values for objects contralable by the user
+
+let random_x = Math.floor(Math.random() * canvas.width) + 1;
+let random_y = Math.floor(Math.random() * canvas.height) + 1;
+let random_radius = Math.floor(Math.random() * max_size) + 1;
+let random_speed = Math.floor(Math.random() * max_speed) + 1;
+
+
+//background customisation
+
+let $color_picker = document.getElementById('color_value');
+let $div_table = document.querySelector('.table');
+$div_table.style.height = canvas.height + "px";
+$color_picker.value = background_color;
+
+let $reset_background = document.getElementById("reset_background")
+$reset_background.onclick = () => { $color_picker.value = background_color }
+
+
 //classes
 
 class object_contructor {
 	constructor(type, x, y, speed, color = "black", radius = null, width = null, height = null) {
+
+		//type of object
 		this.type = type;
 		this.light_souce = false;
 
+		//speed and positin atributes
 		this.x = x;
 		this.y = y;
-
-		this.color = color;
-		this.grd = this.color;
-
 		this.speed = speed;
 		this.text = 0;
 		this.dx = 2 * this.speed;
 		this.dy = this.speed;
 
+		//miscelaneous
+		this.color = color;
+		this.grd = this.color;
 		this.linew_width = 3;
 		this.shadow_color = "black";
 		this.shadow_blur = 20;
@@ -88,6 +95,7 @@ class object_contructor {
 
 		//this.image_path = "792632.png";
 
+		//object constructor
 		if (this.type === "square") {
 			this.width = width;
 			this.height = height;
@@ -96,7 +104,9 @@ class object_contructor {
 			this.centerX = this.x + this.width * 0.5;
 			this.centerY = this.y + this.height * 0.5;
 
-		} else if (this.type == "circle") {
+		}
+
+		else if (this.type == "circle") {
 			this.radius = radius;
 			this.mass = ((this.radius * (Math.PI ** 2)) * 0.01) * 0.12;
 
@@ -107,11 +117,13 @@ class object_contructor {
 		//this.speed = this.speed * this.mass
 	}
 
+	//defining boundaries for rectangle like objects
 	get bottom() { return this.y + this.height }
 	get left() { return this.x }
 	get right() { return this.x + this.width }
 	get top() { return this.y }
 
+	//generator of random colors
 	random_color() {
 		let letters = "0123456789ABCDEF";
 		let color = "#";
@@ -121,13 +133,14 @@ class object_contructor {
 		this.color = color;
 	}
 
+
+	//object drawer and shadow definer (needs to be refactor and change the shadow part)
 	draw(ctx) {
+
 		ctx.shadowBlur = this.shadow_blur;
 		ctx.lineWidth = this.linew_width;
 
 		this.light_souce === true ? ctx.shadowColor = this.color : ctx.shadowColor = this.shadow_color;
-
-
 
 		switch (this.type) {
 			case "square":
@@ -153,6 +166,7 @@ class object_contructor {
 					} else { this.grd = this.color }
 
 				} else { this.grd = this.color }
+
 				//ctx.fillStyle = this.color
 
 				ctx.fillStyle = this.grd;
@@ -201,7 +215,7 @@ class object_contructor {
 				ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
 				ctx.fillStyle = this.grd;
 
-				if (this.outline === true) {			
+				if (this.outline === true) {
 					ctx.stroke();
 					ctx.fill();
 				} else {
@@ -213,6 +227,7 @@ class object_contructor {
 		}
 	}
 
+	//not working but it's suppose to render a image inside the object
 	create_image(ctx) {
 		let myImage = document.createElement("img");
 		myImage.src = this.image_path;
@@ -223,6 +238,7 @@ class object_contructor {
 		};
 	}
 
+	//this makes the object move and prevent for leaving the screen
 	update() {
 		this.draw(ctx);
 
@@ -271,6 +287,8 @@ class object_contructor {
 		this.y += this.dy;
 	}
 
+	//used for drawing lines from the center of this objct to the other inside the object_or_array
+	//the object_or_array must be inserted as [object] for single object or a list with a bunch of objects
 	draw_line(object_or_array) {
 		object_or_array.forEach((element) => {
 			ctx.beginPath();
@@ -288,6 +306,7 @@ class object_contructor {
 		});
 	}
 
+	//colision detection beteween squares or rectangles
 	square_square_colision(obj2) {
 		if (
 			this.x + this.width >= obj2.x &&
@@ -301,6 +320,7 @@ class object_contructor {
 		}
 	}
 
+	//colision detection for interacting circle and rectangles
 	circle_rectangle_colision(circle) {
 		if (
 			this.x + this.width >= circle.x - circle.radius &&
@@ -314,6 +334,7 @@ class object_contructor {
 		}
 	}
 
+	//colision detection for circle to circle
 	circle_colision(circle) {
 		let distanceX = circle.x - this.x;
 		let distanceY = circle.y - this.y;
@@ -329,6 +350,8 @@ class object_contructor {
 		}
 	}
 
+	//don't really know if this here works in practice but, it used for return the closes point in this object
+	//in relation to another
 	boundaring_distance(element) {
 		let varx = element.x, vary = element.y;
 
@@ -352,7 +375,8 @@ class object_contructor {
 	}
 
 
-
+	//response to the colision between squares
+	//values must be a list containg the squares
 	square_response(values) {
 		//colision_response_with_squares
 
@@ -383,18 +407,21 @@ class object_contructor {
 							element.dx = -element.dx;
 						}
 					}
+					//uncomment the following line for making the objects stop
 					//this.dx = element.dx = this.dy = element.dy = 0;
-
 				}
 			}
-
-			//this.update();
-			//element.update();
 		});
 	}
 
+	//colision response for circles and square
+	//can and will accept a list containg squares or circles
+	//needs to be a list
+	//it has two types of response, they are determined by the type of the object on wich is determined by this.type
 	circle_square_response(circles) {
+
 		circles.forEach((element) => {
+
 			switch (this.type) {
 				case "square":
 					if (this.circle_rectangle_colision(element)) {
@@ -464,7 +491,6 @@ class object_contructor {
 						}
 					}
 
-					//if (vectorX == 0 && vector_y == 0) { element.x = this.right + element.radius }
 					break;
 
 				case "circles":
@@ -533,14 +559,15 @@ class object_contructor {
 
 							}
 						}
-
-						//if (vectorX == 0 && vector_y == 0) { element.x = this.right + element.radius }
 						break;
 					}
 			}
 		});
 	}
 
+	//colision responde between circles
+	//must be a list
+	//cannot accept a list with squares
 	circle_response(list) {
 		list.forEach((element) => {
 			if (element.x == this.x && element.y == this.y) {
@@ -584,7 +611,7 @@ class object_contructor {
 						this.y += radius_distance;
 					}
 
-
+					//uncomment the following line for making the objects stop when colision
 					//this.dx = element.dx = this.dy = element.dy = 0
 				}
 			}
@@ -592,132 +619,173 @@ class object_contructor {
 	}
 }
 
-//classes objects
-//buttons for creating stuff
+//classes objects and buttons
 
+
+//toggles functions {
 change_toggle_all = () => { return lines_toggle = !lines_toggle }
 change_toggle_square = () => { return square_toggle = !square_toggle }
 change_toggle_circle = () => { return circle_toggle = !circle_toggle }
 
-let $all_line = document.getElementById("show_all_line").addEventListener('click', change_toggle_all);
-let $square_line = document.getElementById("show_square_line").addEventListener('click', change_toggle_square);
-let $circle_line = document.getElementById("show_circle_line").addEventListener('click', change_toggle_circle);
+let $all_line = document.getElementById("show_all_line").onclick = () => { change_toggle_all() }
+let $square_line = document.getElementById("show_square_line").onclick = () => { change_toggle_square() }
+let $circle_line = document.getElementById("show_circle_line").onclick = () => { change_toggle_circle() }
 
-let $creat_light = document.getElementById("create_light");
+//button tha create a luminous object on the canvas
+//create and destroy light
+let $create_light = document.getElementById("create_light").onclick = () => { generate_random_objects("circle", true) }
+let $delete_light = document.getElementById("delete_light").onclick = () => { light_sources.pop() }
 
-let $create_circle = document.getElementById("create_circle");
-$create_circle.onclick = () => {
-	let random_x = Math.floor(Math.random() * canvas.width) + 1;
-	let random_y = Math.floor(Math.random() * canvas.height) + 1;
-	let random_radius = Math.floor(Math.random() * max_size) + 1;
-	if (random_radius < 20) { random_radius = 20 }
-	let random_speed = Math.floor(Math.random() * max_speed) + 1;
+//create and destroy an circle
+let $create_circle = document.getElementById("create_circle").onclick = () => { generate_random_objects("circle") }
+let $delete_circle = document.getElementById("delete_circle").onclick = () => { circles.pop() };
 
-	let random_circle = new object_contructor("circle", random_x, random_y, random_speed, "purple", random_radius);
-	random_circle.random_color();
-	circles.push(random_circle);
-};
-
-$creat_light.onclick = () => {
-	let random_x = Math.floor(Math.random() * canvas.width) + 1;
-	let random_y = Math.floor(Math.random() * canvas.height) + 1;
-	let random_radius = Math.floor(Math.random() * max_size) + 1;
-	if (random_radius < 20) { random_radius = 20 }
-	let random_speed = Math.floor(Math.random() * max_speed) + 1;
-
-	let random_circle = new object_contructor("circle", random_x, random_y, random_speed, "purple", random_radius);
-	random_circle.random_color();
-	random_circle.light_souce = true;
-	light_sources.push(random_circle);
-};
+//create and destroy a square
+let $create_square = document.getElementById("create_square").onclick = () => { generate_random_objects("square") }
+let $delete_square = document.getElementById("delete_square").onclick = () => { squares.pop() }
 
 
+//make the objects stop and move again and for cleaning the canvas and outline toggle
+let $stop = document.getElementById("stop").onclick = () => { stop_movement() }
+let $start = document.getElementById("start").onclick = () => { start_movement() }
+let $clear_canvas = document.getElementById("clear_all").onclick = () => { clear([squares, circles, light_sources]) }
 
-let $create_square = document.getElementById("create_square");
-$create_square.onclick = function () {
-	let random_x = Math.floor(Math.random() * canvas.width) + 1;
-	let random_y = Math.floor(Math.random() * canvas.height) + 1;
-
-	let random_width = Math.floor(Math.random() * max_size) + 1;
-	if (random_width < 20) { random_width = 20; }
-
-	let random_height = Math.floor(Math.random() * max_size) + 1;
-	if (random_height < 20) { random_height = 20 }
-
-	let random_speed = Math.floor(Math.random() * max_speed) + 1;
-
-	let random_square = new object_contructor("square", random_x, random_y, random_speed, "black", null, random_width, random_height);
-	random_square.random_color();
-	squares.push(random_square);
-};
-
-let $delete_square = document.getElementById("delete_square");
-$delete_square.onclick = function () { squares.pop() };
-
-let $delete_circle = document.getElementById("delete_circle");
-$delete_circle.onclick = function () { circles.pop() };
-
-let $delete_light = document.getElementById("delete_light").onclick = () => {
-	light_sources.pop()
+let $show_outline = document.getElementById("show_outline").onclick = () => {
+	new_list = squares.concat(circles, light_sources);
+	new_list.forEach(i => { i.outline = !i.outline })
 }
 
-let $stop = document.getElementById("stop").addEventListener('click', stop_movement);
-let $start = document.getElementById("start").addEventListener('click', start_movement);
 
-//controlables
+//controlables by mouse
+let $create_my_circle = document.getElementById("create_my_circle").onclick = () => {
+	let my_circle = new object_contructor("circle", mouseX, mouseY, random_speed, "black", my_circle_radius);
+	my_circle.random_color();
+	circles.push(my_circle);
+}
+let $crete_my_square = document.getElementById("create_my_square").onclick = () => {
+	let my_square = new object_contructor("square", mouseX, mouseY, random_speed, "black", 0, 80, 80);
+	my_square.random_color();
+	squares.push(my_square);
+}
+let $create_my_light = document.getElementById('create_my_light').onclick = () => {
+	let my_light = new object_contructor("circle", mouseX, mouseY, 0, "white", 30);
+	my_light.light_souce = true;
+	light_sources.push(my_light);
+}
+
 
 let my_square = new object_contructor("square", 0, 0, Math.floor(Math.random() * max_speed) + 1, "black", null, 100, 100);
 let my_circle = new object_contructor("circle", 0, 0, Math.floor(Math.random() * max_speed) + 1, "black", my_circle_radius);
-let my_light = new object_contructor("circle", mouseX, mouseY, 0, "white", 20)
+let my_light = new object_contructor("circle", mouseX, mouseY, 0, "white", 20);
 
+//let my_circle, my_light, my_square;
 
 //functions here
-//functions to set up figure and mouse movement
 
-function update_my_circle(element) {
+generate_random_objects = (object_type, light_property = false) => {
+
+	if (object_type === "square") {
+
+		let random_x = Math.floor(Math.random() * canvas.width) + 1;
+		let random_y = Math.floor(Math.random() * canvas.height) + 1;
+
+		let random_width = Math.floor(Math.random() * max_size) + 1;
+		if (random_width < 20) { random_width = 20; }
+
+		let random_height = Math.floor(Math.random() * max_size) + 1;
+		if (random_height < 20) { random_height = 20 }
+
+		let random_speed = Math.floor(Math.random() * max_speed) + 1;
+
+		let random_square = new object_contructor("square", random_x, random_y, random_speed, "black", null, random_width, random_height);
+		random_square.random_color();
+		squares.push(random_square);
+
+	}
+	if (object_type === "circle") {
+
+		let random_x = Math.floor(Math.random() * canvas.width) + 1;
+		let random_y = Math.floor(Math.random() * canvas.height) + 1;
+
+		let random_radius = Math.floor(Math.random() * max_size) + 1;
+		if (random_radius < 20) { random_radius = 20 }
+
+		let random_speed = Math.floor(Math.random() * max_speed) + 1;
+
+		let random_circle = new object_contructor("circle", random_x, random_y, random_speed, "purple", random_radius);
+		random_circle.random_color();
+
+		if (light_property === true) {
+
+			random_circle.light_souce = true;
+			light_sources.push(random_circle);
+
+		} else {
+
+			circles.push(random_circle);
+
+		}
+	}
+}
+
+
+function update_object(object_type, element, light = false) {
 	element.update();
 
-	my_light = new object_contructor("circle", mouseX, mouseY, 0, "white", 30);
-	my_light.light_souce = true;
-	light_sources[0] = my_light;
-	update_position(element);
-}
+	if (object_type === "circle") {
+		element.circle_square_response(squares);
+		element.circle_response(circles);
+		element.circle_response(light_sources);
 
-function update_my_square() {
-	my_square.update();
-	//my_square = new object_contructor(mouseX, mouseY, 80, 80, 0);
-	update_position_square(my_square);
-}
-
-function update_position_square(square) {
-	if (square.x <= 0) { (square.x = 1), (square.dx = -square.dx); }
-	if (square.y <= 0) { (square.y = 1), (square.dy = -square.dy); }
-
-	if (square.x + square.width >= canvas.width) {
-		(square.x = canvas.width - square.width - 1), (square.dx = -square.dx);
+		if (light === true) {
+			my_light = new object_contructor("circle", mouseX, mouseY, 0, "white", 30);
+			my_light.light_souce = true;
+			light_sources[0] = my_light;
+		}
 	}
-	if (square.y + square.height >= canvas.height) {
-		(square.y = canvas.height - square.height - 1), (square.dy = -square.dy);
+
+	if (object_type === "square") {
+		element.square_response(squares);
 	}
+
+	update_position(object_type, element);
 }
 
-function update_position(circle) {
+function update_position(object_type, circle) {
 	//stop the movement
-	if (circle.x - circle.radius <= 0) { (circle.x = circle.radius + 1) }
-	if (circle.y - circle.radius <= 0) { (circle.y = circle.radius + 1) }
-	if (circle.x + circle.radius >= canvas.width) { (circle.x = canvas.width - circle.radius - 1) }
-	if (circle.y + circle.radius >= canvas.height) { (circle.y = canvas.height - circle.radius - 1) }
+	if (object_type === "circle") {
+		if (circle.x - circle.radius <= 0) { (circle.x = circle.radius + 1) }
+		if (circle.y - circle.radius <= 0) { (circle.y = circle.radius + 1) }
+		if (circle.x + circle.radius >= canvas.width) { (circle.x = canvas.width - circle.radius - 1) }
+		if (circle.y + circle.radius >= canvas.height) { (circle.y = canvas.height - circle.radius - 1) }
+	}
+	else if (object_type === "square") {
+		if (square.x <= 0) { (square.x = 1), (square.dx = -square.dx); }
+		if (square.y <= 0) { (square.y = 1), (square.dy = -square.dy); }
+
+		if (square.x + square.width >= canvas.width) {
+			(square.x = canvas.width - square.width - 1), (square.dx = -square.dx);
+		}
+		if (square.y + square.height >= canvas.height) {
+			(square.y = canvas.height - square.height - 1), (square.dy = -square.dy);
+		}
+	}
 }
 
-function clear() {
-	if (squares.length != 0 || circles.length != 0 || light_sources.length != 0) {
-		let size1 = circles.length;
-		let size2 = squares.length;
-		let size3 = light_sources.length
-		for (var i = 0; i < Math.max(size1, size2, size3) + 1; i++) {
-			circles.pop();
-			squares.pop();
-			light_sources.pop();
+
+function clear(list) {
+	let sizes = [];
+	for (i of list) { sizes.push(i.length) }
+	let condition_loop;
+	sizes.forEach(i => { if (i != 0) { condition_loop = true } });
+	console.log(condition_loop)
+
+	if (condition_loop) {
+
+		for (var i = 0; i < Math.max(...sizes) + 1; i++) {
+			list.forEach(i => {
+				i.pop()
+			})
 		}
 	} else { return }
 }
@@ -758,50 +826,31 @@ function start_movement() {
 	}
 }
 
-
-
-//not working yet
-
-let $create_my_circle = document.getElementById("create_my_circle");
-let $crete_my_square = document.getElementById("create_my_square");
-let $create_my_light = document.getElementById('create_my_light');
-let $show_outline = document.getElementById("show_outline").onclick = () => {
-	circles.forEach(i => {
-		i.outline = !i.outline
-	});
+function render_objects(squares, circles) {
 	squares.forEach(i => {
-		i.outline = !i.outline
+		i.forEach(element => {
+			for (c of squares) {
+				element.square_response(c);
+			}
+			for (a of circles) {
+				element.circle_square_response(a);
+			}
+			element.update();
+		});
+	})
+
+	circles.forEach(i => {
+		i.forEach(element => {
+			for (b of circles) {
+				element.circle_response(b)
+			}
+			element.update();
+		});
 	});
 }
 
-let $clear_canvas = document.getElementById("clear_all");
-
-$crete_my_square.onclick = function () {
-	let my_square = new object_contructor("square", mouseX, mouseY, random_speed, "black", 0, 80, 80);
-	my_square.random_color();
-	squares.push(my_square);
-};
-
-$create_my_circle.onclick = function () {
-	let my_circle = new object_contructor("circle", mouseX, mouseY, random_speed, "black", my_circle_radius);
-	my_circle.random_color();
-	circles.push(my_circle);
-};
-
-$create_my_light.onclick = function () {
-	let my_circle = new object_contructor("circle", mouseX, mouseY, 0, "white", 30);
-	my_light.light_souce = true;
-	light_sources.push(my_circle);
-};
-
-function game() {
-
-	canvas.style.background = $color_picker.value;
-
-
-	//update_my_circle(my_light);
-
-	light_sources.forEach((element) => {
+function render_light(list) {
+	list.forEach((element) => {
 
 		let grd = ctx.createRadialGradient(element.x, element.y, element.radius * element.mass, element.x, element.y, canvas.width * 0.5);
 
@@ -818,43 +867,39 @@ function game() {
 		element.update();
 		//element.random_color();
 	});
+}
 
-	my_circle.circle_square_response(squares);
-	my_circle.circle_response(circles);
+//not working yet {
 
-	let new_list = squares.concat(circles);
+//}
+
+function game() {
+
+	canvas.style.background = $color_picker.value;
+	let new_list = squares.concat(circles, light_sources);
+	//console.log(new_list);
+
+	render_light(light_sources)
+	//update_object("circle", my_light, true)
+	/*
+	update_light = false
+	light_sources.forEach(i => { if (i === my_light) { update_light = true } else { update_light = false } })
+	if (update_light) { update_object("circle", my_light, true) }
+	*/
+
 	//draw_lines(new_list)
-
+	//console.table(lines_toggle, circle_toggle, square_toggle)
 	if (lines_toggle === true) { draw_lines(new_list) }
 	if (circle_toggle === true) { draw_lines(circles) }
 	if (square_toggle === true) { draw_lines(squares) }
 
-
-	$clear_canvas.onclick = () => { clear() };
-
-
-	squares.forEach((element) => {
-
-		element.square_response(squares);
-		element.circle_square_response(circles);
-		element.circle_square_response(light_sources);
-		element.update();
-		//element.random_color();
-	});
-
-	circles.forEach((element) => {
-
-		element.circle_response(circles);
-		element.circle_response(light_sources);
-		element.update();
-		//element.random_color();
-	});
-
+	render_objects([squares], [circles, light_sources]);
 
 }
 
-let update_frame = function () {
+let update_frame = () => {
 	requestAnimationFrame(update_frame);
+
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	game();
 };
