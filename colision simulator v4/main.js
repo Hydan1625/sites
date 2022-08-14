@@ -99,7 +99,7 @@ class object_contructor {
 		if (this.type === "square") {
 			this.width = width;
 			this.height = height;
-			this.mass = ((this.width * this.height) * 0.01) * 0.12;
+			this.mass = ((this.width * this.height) * 0.01); // + 0.12
 
 			this.centerX = this.x + this.width * 0.5;
 			this.centerY = this.y + this.height * 0.5;
@@ -108,7 +108,8 @@ class object_contructor {
 
 		else if (this.type == "circle") {
 			this.radius = radius;
-			this.mass = ((this.radius * (Math.PI ** 2)) * 0.01) * 0.12;
+			this.mass = ((this.radius * (Math.PI ** 2)) * 0.01) * 0.12; // * 0.12
+			this.light_constant = ((this.mass ** 2) * this.radius)
 
 			this.centerX = this.x;
 			this.centerY = this.y;
@@ -136,11 +137,14 @@ class object_contructor {
 
 	//object drawer and shadow definer (needs to be refactor and change the shadow part)
 	draw(ctx) {
+		let element;
 
 		ctx.shadowBlur = this.shadow_blur;
 		ctx.lineWidth = this.linew_width;
 
 		this.light_souce === true ? ctx.shadowColor = this.color : ctx.shadowColor = this.shadow_color;
+
+		ctx.rota
 
 		switch (this.type) {
 			case "square":
@@ -150,19 +154,23 @@ class object_contructor {
 
 					if (light_sources.length > 0) {
 
-						light_sources.forEach(element => {
-							this.grd = ctx.createRadialGradient(element.x, element.y, element.radius * element.mass, element.x, element.y, canvas.width);
+						//light_sources.forEach(element => {
+						element = light_sources[light_sources.length - 1];
 
-							this.grd.addColorStop(0, "white")
-							this.grd.addColorStop(0.05, element.color);
-							this.grd.addColorStop(0.15, this.color);
-							this.grd.addColorStop(0.5, "black");
-							this.grd.addColorStop(1, "black");
+						this.grd = ctx.createRadialGradient(element.x, element.y, element.radius * element.mass, element.x, element.y, canvas.width);
+						//this.grd = ctx.createRadialGradient(element.x, element.y, element.radius * 0.5, element.x, element.y, element.light_constant * 2);
 
-							element.x > this.x + this.width ? ctx.shadowOffsetX = - 20 : ctx.shadowOffsetX = 20;
-							element.y > this.y + this.height ? ctx.shadowOffsetY = - 20 : ctx.shadowOffsetY = 20;
+						this.grd.addColorStop(0, "white")
+						this.grd.addColorStop(0.05, element.color);
+						this.grd.addColorStop(0.15, this.color);
+						this.grd.addColorStop(0.5, "black");
+						this.grd.addColorStop(1, "black");
 
-						});
+						element.x > this.x + this.width ? ctx.shadowOffsetX = - 20 : ctx.shadowOffsetX = 20;
+						element.y > this.y + this.height ? ctx.shadowOffsetY = - 20 : ctx.shadowOffsetY = 20;
+
+						//});
+
 					} else { this.grd = this.color }
 
 				} else { this.grd = this.color }
@@ -188,18 +196,21 @@ class object_contructor {
 
 					if (light_sources.length > 0) {
 
-						light_sources.forEach(element => {
-							this.grd = ctx.createRadialGradient(element.x, element.y, element.radius * element.mass, element.x, element.y, canvas.width * 0.5);
+						//light_sources.forEach(element => {
+						element = light_sources[light_sources.length - 1];
 
-							this.grd.addColorStop(0, "white")
-							this.grd.addColorStop(0.15, element.color);
-							this.grd.addColorStop(0.5, this.color);
-							this.grd.addColorStop(1, "black");
+						this.grd = ctx.createRadialGradient(element.x, element.y, element.radius * element.mass, element.x, element.y, canvas.width * 0.5);
+						//this.grd = ctx.createRadialGradient(element.x, element.y, element.radius, element.x, element.y, element.light_constant);
 
-							element.x > this.x + this.radius ? ctx.shadowOffsetX = - 20 : ctx.shadowOffsetX = 20;
-							element.y > this.y + this.radius ? ctx.shadowOffsetY = - 20 : ctx.shadowOffsetY = 20;
+						this.grd.addColorStop(0, "white")
+						this.grd.addColorStop(0.15, element.color);
+						this.grd.addColorStop(0.5, this.color);
+						this.grd.addColorStop(1, "black");
 
-						});
+						element.x > this.x + this.radius ? ctx.shadowOffsetX = - 20 : ctx.shadowOffsetX = 20;
+						element.y > this.y + this.radius ? ctx.shadowOffsetY = - 20 : ctx.shadowOffsetY = 20;
+
+						//});
 					} else { this.grd = this.color }
 
 				} else { this.grd = this.color }
@@ -622,7 +633,7 @@ class object_contructor {
 //classes objects and buttons
 
 
-//toggles functions {
+//toggles functions
 change_toggle_all = () => { return lines_toggle = !lines_toggle }
 change_toggle_square = () => { return square_toggle = !square_toggle }
 change_toggle_circle = () => { return circle_toggle = !circle_toggle }
@@ -850,10 +861,22 @@ function render_objects(squares, circles) {
 }
 
 function render_light(list) {
-	list.forEach((element) => {
+	//list.forEach((element) => {
+	if (list.length > 0) {
+		let element = list[list.length - 1];
+		let grd;
 
-		let grd = ctx.createRadialGradient(element.x, element.y, element.radius * element.mass, element.x, element.y, canvas.width * 0.5);
+		switch (element.type) {
+			case "circle":
+				grd = ctx.createRadialGradient(element.x, element.y, element.radius * element.mass, element.x, element.y, canvas.width * 0.5);
+				//grd = ctx.createRadialGradient(element.x, element.y, element.radius * 0.5, element.x, element.y, element.light_constant);
+				break;
+			case "square":
+				grd = ctx.createRadialGradient(element.x, element.y, (element.width + element.height) * 0.5, element.x, element.y, canvas.width * 0.5);
+				//grd = ctx.createRadialGradient(element.x, element.y, (element.width + element.height) * 0.5, element.x, element.y, (element.width + element.height) * 5);
+				break;
 
+		}
 		grd.addColorStop(0, element.color);
 		grd.addColorStop(0.3, $color_picker.value);
 		grd.addColorStop(0.85, $color_picker.value);
@@ -862,11 +885,19 @@ function render_light(list) {
 		ctx.fillStyle = grd;
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-		element.circle_response(light_sources);
-		element.circle_response(circles);
+		if (element.type === "circle") {
+			element.circle_response(light_sources);
+			element.circle_response(circles);
+		}
+		else {
+			element.square_response(squares)
+			element.circle_square_response(circles);
+			element.circle_square_response(light_sources);
+		}
 		element.update();
 		//element.random_color();
-	});
+		//});
+	}
 }
 
 //not working yet {
@@ -880,15 +911,9 @@ function game() {
 	//console.log(new_list);
 
 	render_light(light_sources)
+	//render_light(squares)
 	//update_object("circle", my_light, true)
-	/*
-	update_light = false
-	light_sources.forEach(i => { if (i === my_light) { update_light = true } else { update_light = false } })
-	if (update_light) { update_object("circle", my_light, true) }
-	*/
 
-	//draw_lines(new_list)
-	//console.table(lines_toggle, circle_toggle, square_toggle)
 	if (lines_toggle === true) { draw_lines(new_list) }
 	if (circle_toggle === true) { draw_lines(circles) }
 	if (square_toggle === true) { draw_lines(squares) }
