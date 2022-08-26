@@ -2,15 +2,31 @@ body {
     background-color: rgba(89, 172, 136, 0.789);
 }
 
+.code {
+
+    float: top;
+    position: relative;
+    size: 200px;
+    width: 100%;
+    height: 200px;
+    border: 4px solid white;
+    background-color: cornflowerblue;
+    border-radius: 10px;
+    margin-bottom: auto;
+    align-items: center;
+    font-size: 200px;
+
+}
+
 table {
     float: left;
     position: relative;
     size: 200px;
     width: 50%;
     height: 280px;
-    border: 4px solid  white;
+    border: 4px solid white;
     background-color: cornflowerblue;
-    border-radius: 10px ;
+    border-radius: 10px;
     margin-bottom: auto;
     align-items: center;
 }
@@ -31,7 +47,7 @@ button {
     width: 100%;
     height: 20%;
     font-family: 'Times New Roman', Times, serif;
-    font-size: 20px;
+    font-size: 50px;
 }
 
 td {
@@ -39,8 +55,7 @@ td {
 }
 
 
-.valores_calculados {
-    padding: 10%;
+/* .valores_calculados {
     float: right;
     position: relative;
     margin: 0;
@@ -50,5 +65,5 @@ td {
     block-size: 100px;
     width: 28%;
     height: 50%;
-    height: fixed;
-}
+
+} */
