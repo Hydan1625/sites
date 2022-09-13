@@ -13,7 +13,6 @@ let new_list = [];
 
 let background_color = "#d87093";
 
-
 //switches
 
 let state_draw_lines = false;
@@ -37,7 +36,6 @@ window.addEventListener("resize", resizeing, true);
 let mouseX = Math.floor(canvas.width / 2);
 let mouseY = Math.floor(canvas.height / 2);
 
-
 function resizeing(event) {
 	canvas.width = innerWidth - 400;
 	canvas.height = innerHeight - 100;
@@ -56,23 +54,31 @@ let random_y = Math.floor(Math.random() * canvas.height) + 1;
 let random_radius = Math.floor(Math.random() * max_size) + 1;
 let random_speed = Math.floor(Math.random() * max_speed) + 1;
 
-
 //background customisation
 
-let $color_picker = document.getElementById('color_value');
-let $div_table = document.querySelector('.table');
+let $color_picker = document.getElementById("color_value");
+let $div_table = document.querySelector(".table");
 $div_table.style.height = canvas.height + "px";
 $color_picker.value = background_color;
 
-let $reset_background = document.getElementById("reset_background")
-$reset_background.onclick = () => { $color_picker.value = background_color }
-
+let $reset_background = document.getElementById("reset_background");
+$reset_background.onclick = () => {
+	$color_picker.value = background_color;
+};
 
 //classes
 
 class object_contructor {
-	constructor(type, x, y, speed, color = "black", radius = null, width = null, height = null) {
-
+	constructor(
+		type,
+		x,
+		y,
+		speed,
+		color = "black",
+		radius = null,
+		width = null,
+		height = null
+	) {
 		//type of object
 		this.type = type;
 		this.light_souce = false;
@@ -99,17 +105,17 @@ class object_contructor {
 		if (this.type === "square") {
 			this.width = width;
 			this.height = height;
-			this.mass = ((this.width * this.height) * 0.01); // + 0.12
+			this.mass = this.width * this.height * 0.01; // + 0.12
+			this.half_sizeW = this.width * 0.5;
+			this.half_sizeH = this.height * 0.5;
 
 			this.centerX = this.x + this.width * 0.5;
 			this.centerY = this.y + this.height * 0.5;
-
-		}
-
-		else if (this.type == "circle") {
+		} else if (this.type == "circle") {
 			this.radius = radius;
-			this.mass = ((this.radius * (Math.PI ** 2)) * 0.01) * 0.12; // * 0.12
-			this.light_constant = ((this.mass ** 2) * this.radius)
+			this.mass = this.radius * Math.PI ** 2 * 0.01 * 0.12; // * 0.12
+			this.light_constant = this.mass ** 2 * this.radius;
+			this.half_size = this.radius * 0.5;
 
 			this.centerX = this.x;
 			this.centerY = this.y;
@@ -119,10 +125,18 @@ class object_contructor {
 	}
 
 	//defining boundaries for rectangle like objects
-	get bottom() { return this.y + this.height }
-	get left() { return this.x }
-	get right() { return this.x + this.width }
-	get top() { return this.y }
+	get bottom() {
+		return this.y + this.height;
+	}
+	get left() {
+		return this.x;
+	}
+	get right() {
+		return this.x + this.width;
+	}
+	get top() {
+		return this.y;
+	}
 
 	//generator of random colors
 	random_color() {
@@ -134,7 +148,6 @@ class object_contructor {
 		this.color = color;
 	}
 
-
 	//object drawer and shadow definer (needs to be refactor and change the shadow part)
 	draw(ctx) {
 		let element;
@@ -142,38 +155,43 @@ class object_contructor {
 		ctx.shadowBlur = this.shadow_blur;
 		ctx.lineWidth = this.linew_width;
 
-		this.light_souce === true ? ctx.shadowColor = this.color : ctx.shadowColor = this.shadow_color;
-
-		ctx.rota
+		this.light_souce === true
+			? (ctx.shadowColor = this.color)
+			: (ctx.shadowColor = this.shadow_color);
 
 		switch (this.type) {
 			case "square":
 				ctx.beginPath();
 
 				if (this.light_souce === false) {
-
 					if (light_sources.length > 0) {
-
 						//light_sources.forEach(element => {
 						element = light_sources[light_sources.length - 1];
 
-						this.grd = ctx.createRadialGradient(element.x, element.y, element.radius * element.mass, element.x, element.y, canvas.width);
+						this.grd = ctx.createRadialGradient(
+							element.x,
+							element.y,
+							element.radius * element.mass,
+							element.x,
+							element.y,
+							canvas.width
+						);
 						//this.grd = ctx.createRadialGradient(element.x, element.y, element.radius * 0.5, element.x, element.y, element.light_constant * 2);
 
-						this.grd.addColorStop(0, "white")
+						this.grd.addColorStop(0, "white");
 						this.grd.addColorStop(0.05, element.color);
 						this.grd.addColorStop(0.15, this.color);
 						this.grd.addColorStop(0.5, "black");
 						this.grd.addColorStop(1, "black");
 
-						element.x > this.x + this.width ? ctx.shadowOffsetX = - 20 : ctx.shadowOffsetX = 20;
-						element.y > this.y + this.height ? ctx.shadowOffsetY = - 20 : ctx.shadowOffsetY = 20;
+						this.display_shadow(element);
 
-						//});
-
-					} else { this.grd = this.color }
-
-				} else { this.grd = this.color }
+					} else {
+						this.grd = this.color;
+					}
+				} else {
+					this.grd = this.color;
+				}
 
 				//ctx.fillStyle = this.color
 
@@ -193,34 +211,41 @@ class object_contructor {
 				ctx.beginPath();
 
 				if (this.light_souce === false) {
-
 					if (light_sources.length > 0) {
-
 						//light_sources.forEach(element => {
 						element = light_sources[light_sources.length - 1];
 
-						this.grd = ctx.createRadialGradient(element.x, element.y, element.radius * element.mass, element.x, element.y, canvas.width * 0.5);
+						this.grd = ctx.createRadialGradient(
+							element.x,
+							element.y,
+							element.radius * element.mass,
+							element.x,
+							element.y,
+							canvas.width * 0.5
+						);
+
 						//this.grd = ctx.createRadialGradient(element.x, element.y, element.radius, element.x, element.y, element.light_constant);
 
-						this.grd.addColorStop(0, "white")
+						this.grd.addColorStop(0, "white");
 						this.grd.addColorStop(0.15, element.color);
 						this.grd.addColorStop(0.5, this.color);
 						this.grd.addColorStop(1, "black");
 
-						element.x > this.x + this.radius ? ctx.shadowOffsetX = - 20 : ctx.shadowOffsetX = 20;
-						element.y > this.y + this.radius ? ctx.shadowOffsetY = - 20 : ctx.shadowOffsetY = 20;
+						this.display_shadow(element);
 
-						//});
-					} else { this.grd = this.color }
-
-				} else { this.grd = this.color }
+					} else {
+						this.grd = this.color;
+					}
+				} else {
+					this.grd = this.color;
+				}
 
 				ctx.fillStyle = this.grd;
 				ctx.strokeStyle = this.color;
 
 				ctx.textAlign = "center";
 				ctx.textBaseline = "middle";
-				ctx.font = Math.floor(this.radius * 0.5) + "px" + " Arial";
+				ctx.font = `${Math.floor(this.radius * 0.5)}px Arial`;
 				ctx.fillText(this.text, this.x, this.y);
 
 				ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
@@ -228,14 +253,51 @@ class object_contructor {
 
 				if (this.outline === true) {
 					ctx.stroke();
-					ctx.fill();
-				} else {
-					//ctx.stroke();
-					ctx.fill();
 				}
+
+				//ctx.stroke();
+				ctx.fill();
 				ctx.closePath();
 				break;
 		}
+	}
+
+	display_shadow(element) {
+		let distanceX = this.centerX - element.centerX;
+		let distanceY = this.centerY - element.centerY;
+
+		if (this.type === "square") {
+			if (distanceY >= this.half_sizeH) {
+				(distanceY = this.half_sizeH);
+			}
+			else if (distanceY <= -this.half_sizeH) {
+				(distanceY = -this.half_sizeH);
+			}
+			if (distanceX >= this.half_sizeW) {
+				(distanceX = this.half_sizeW);
+			}
+			else if (distanceX <= -this.half_sizeW) {
+				(distanceX = -this.half_sizeW);
+			}
+		} else {
+			if (distanceY >= this.radius) {
+				distanceY = this.radius;
+				console.log(distanceY)
+			}
+			else if (distanceY <= -this.radius) {
+				distanceY = -this.radius;
+				console.log(distanceY)
+			}
+			if (distanceX >= this.radius) {
+				distanceX = this.radius;
+			}
+			else if (distanceX <= -this.radius) {
+				distanceX = -this.radius;
+			}
+		}
+
+		ctx.shadowOffsetX = distanceX;
+		ctx.shadowOffsetY = distanceY;
 	}
 
 	//not working but it's suppose to render a image inside the object
@@ -272,7 +334,6 @@ class object_contructor {
 				this.centerY = this.y + this.height * 0.5;
 
 				//this.create_image(ctx);
-
 				break;
 
 			case "circle":
@@ -291,7 +352,6 @@ class object_contructor {
 
 				this.centerX = this.x;
 				this.centerY = this.y;
-
 		}
 
 		this.x += this.dx;
@@ -319,30 +379,22 @@ class object_contructor {
 
 	//colision detection beteween squares or rectangles
 	square_square_colision(obj2) {
-		if (
-			this.x + this.width >= obj2.x &&
+		return this.x + this.width >= obj2.x &&
 			this.x <= obj2.x + obj2.width &&
 			this.y + this.height >= obj2.y &&
 			this.y <= obj2.y + obj2.height
-		) {
-			return true;
-		} else {
-			return false;
-		}
+			? true
+			: false;
 	}
 
 	//colision detection for interacting circle and rectangles
 	circle_rectangle_colision(circle) {
-		if (
-			this.x + this.width >= circle.x - circle.radius &&
+		return this.x + this.width >= circle.x - circle.radius &&
 			this.x <= circle.x + circle.radius &&
 			this.y + this.height >= circle.y - circle.radius &&
 			this.y <= circle.y + circle.radius
-		) {
-			return true;
-		} else {
-			return false;
-		}
+			? true
+			: false;
 	}
 
 	//colision detection for circle to circle
@@ -351,20 +403,15 @@ class object_contructor {
 		let distanceY = circle.y - this.y;
 		let radius_distance = this.radius + circle.radius;
 
-		if (
-			radius_distance * radius_distance >=
-			distanceX * distanceX + distanceY * distanceY
-		) {
-			return true;
-		} else {
-			return false;
-		}
+		return radius_distance * radius_distance >=
+		distanceX * distanceX + distanceY * distanceY ? true : false;
 	}
 
 	//don't really know if this here works in practice but, it used for return the closes point in this object
 	//in relation to another
 	boundaring_distance(element) {
-		let varx = element.x, vary = element.y;
+		let varx = element.x;
+		let vary = element.y;
 
 		if (element.x < this.x) {
 			varx = this.x;
@@ -385,7 +432,6 @@ class object_contructor {
 		return [varx, vary];
 	}
 
-
 	//response to the colision between squares
 	//values must be a list containg the squares
 	square_response(values) {
@@ -394,33 +440,21 @@ class object_contructor {
 		values.forEach((element) => {
 			if (this.x == element.x && element.y == this.y) {
 				return;
-			} else {
-				if (this.square_square_colision(element)) {
-					// if you add a "!" to the beggining of the if, will make them just stop
+			} else if (this.square_square_colision(element)) {
+				// if you add a "!" to the beggining of the if, will make them just stop
 
-					let vector_x = this.centerX - element.centerX;
-					let vector_y = this.centerY - element.centerY;
+				let vector_x = this.centerX - element.centerX;
+				let vector_y = this.centerY - element.centerY;
 
-					if (vector_y * vector_y > vector_x * vector_x) {
-						if (vector_y > 0) {
-							this.y = element.bottom;
-							element.dy = -element.dy;
-						} else {
-							this.y = element.y - this.height;
-							element.dy = -element.dy;
-						}
-					} else {
-						if (vector_x > 0) {
-							this.x = element.right;
-							element.dx = -element.dx;
-						} else {
-							this.x = element.x - this.width;
-							element.dx = -element.dx;
-						}
-					}
-					//uncomment the following line for making the objects stop
-					//this.dx = element.dx = this.dy = element.dy = 0;
+				if (vector_y * vector_y > vector_x * vector_x) {
+					this.y = vector_y > 0 ? element.bottom : element.y - this.height;
+					element.dy = -element.dy;
+				} else {
+					this.x = vector_x > 0 ? element.right : element.x - this.width;
+					element.dx = -element.dx;
 				}
+				//uncomment the following line for making the objects stop
+				//this.dx = element.dx = this.dy = element.dy = 0;
 			}
 		});
 	}
@@ -430,9 +464,7 @@ class object_contructor {
 	//needs to be a list
 	//it has two types of response, they are determined by the type of the object on wich is determined by this.type
 	circle_square_response(circles) {
-
 		circles.forEach((element) => {
-
 			switch (this.type) {
 				case "square":
 					if (this.circle_rectangle_colision(element)) {
@@ -446,20 +478,12 @@ class object_contructor {
 						if (element.x <= this.x) {
 							varx = this.x;
 						}
-						if (element.x >= this.x + this.width) {
-							varx = this.x + this.width;
-						} else {
-							varx = element.x;
-						}
+						varx = element.x >= this.x + this.width ? this.x + this.width : element.x;
 
 						if (element.y <= this.y) {
 							varx = this.y;
 						}
-						if (element.y >= this.y + this.height) {
-							vary = this.y + this.height;
-						} else {
-							vary = element.y;
-						}
+						vary = element.y >= this.y + this.height ? this.y + this.height : element.y;
 
 						square_radius = Math.sqrt(
 							(this.centerX - varx) * (this.centerX - varx) +
@@ -472,33 +496,13 @@ class object_contructor {
 							Math.sqrt(vectorX * vectorX + vectorY * vectorY);
 
 						if (vectorY * vectorY > vectorX * vectorX) {
-							if (vectorY > 0) {
-								//this.y += distance;
-								element.y = this.top - element.radius - 1;
-								this.dy = -this.dy;
-								element.dy = -element.dy;
-
-							} else {
-								//this.y -= distance;
-								element.y = this.bottom + element.radius + 1;
-								this.dy = -this.dy;
-								element.dy = -element.dy;
-
-							}
+							element.y = vectorY > 0 ? this.top - element.radius - 1 : this.bottom + element.radius + 1;
+							this.dy = -this.dy;
+							element.dy = -element.dy;
 						} else {
-							if (vectorX > 0) {
-								element.x = this.left - element.radius - 1;
-								//this.x += distance;
-								this.dx = -this.dx;
-								element.dx = -element.dx;
-
-							} else {
-								//this.x -= distance;
-								element.x = this.right + element.radius + 1;
-								this.dx = -this.dx;
-								element.dx = -element.dx;
-
-							}
+							element.x = vectorX > 0 ? this.left - element.radius - 1 : this.right + element.radius + 1;
+							this.dx = -this.dx;
+							element.dx = -element.dx;
 						}
 					}
 
@@ -516,20 +520,12 @@ class object_contructor {
 						if (element.x <= this.x) {
 							varx = this.x;
 						}
-						if (element.x >= this.x + this.width) {
-							varx = this.x + this.width;
-						} else {
-							varx = element.x;
-						}
+						varx = element.x >= this.x + this.width ? this.x + this.width : element.x;
 
 						if (element.y <= this.y) {
 							varx = this.y;
 						}
-						if (element.y >= this.y + this.height) {
-							vary = this.y + this.height;
-						} else {
-							vary = element.y;
-						}
+						vary = element.y >= this.y + this.height ? this.y + this.height : element.y;
 
 						square_radius = Math.sqrt(
 							(this.centerX - varx) * (this.centerX - varx) +
@@ -542,33 +538,13 @@ class object_contructor {
 							Math.sqrt(vectorX * vectorX + vectorY * vectorY);
 
 						if (vectorY * vectorY > vectorX * vectorX) {
-							if (vectorY > 0) {
-								//this.y += distance;
-								element.y = this.top - element.radius - 1;
-								this.dy = -this.dy;
-								element.dy = -element.dy;
-
-							} else {
-								//this.y -= distance;
-								element.y = this.bottom + element.radius + 1;
-								this.dy = -this.dy;
-								element.dy = -element.dy;
-
-							}
+							element.y = vectorY > 0 ? this.top - element.radius - 1 : this.bottom + element.radius + 1;
+							this.dy = -this.dy;
+							element.dy = -element.dy;
 						} else {
-							if (vectorX > 0) {
-								element.x = this.left - element.radius - 1;
-								//this.x += distance;
-								this.dx = -this.dx;
-								element.dx = -element.dx;
-
-							} else {
-								//this.x -= distance;
-								element.x = this.right + element.radius + 1;
-								this.dx = -this.dx;
-								element.dx = -element.dx;
-
-							}
+							element.x = vectorX > 0 ? this.left - element.radius - 1 : this.right + element.radius + 1;
+							this.dx = -this.dx;
+							element.dx = -element.dx;
 						}
 						break;
 					}
@@ -583,48 +559,40 @@ class object_contructor {
 		list.forEach((element) => {
 			if (element.x == this.x && element.y == this.y) {
 				return;
-			} else {
+			} else if (this.circle_colision(element)) {
+				let distanceX = this.x - element.x;
+				let distanceY = this.y - element.y;
 
-				if (this.circle_colision(element)) {
+				let radius_distance = this.radius + element.radius;
+				let distance =
+					radius_distance -
+					Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 
-					let distanceX = this.x - element.x;
-					let distanceY = this.y - element.y;
-
-					let radius_distance = this.radius + element.radius;
-					let distance =
-						radius_distance -
-						Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-
-					if (distanceY * distanceY > distanceX * distanceX) {
-						if (distanceY > 0) {
-							this.y += distance;
-							//this.dy = -this.dy;
-							element.dy = -element.dy;
-						} else {
-							this.y -= distance;
-							//this.dy = -this.dy;
-							element.dy = -element.dy;
-						}
+				if (distanceY * distanceY > distanceX * distanceX) {
+					if (distanceY > 0) {
+						this.y += distance;
 					} else {
-						if (distanceX < 0) {
-							this.x -= distance;
-							//this.dx = -this.dx;
-							element.dx = -element.dx;
-						} else {
-							this.x += distance;
-							//this.dx = -this.dx;
-							element.dx = -element.dx;
-						}
+						this.y -= distance;
 					}
-
-					if (distanceX == 0 && distanceY == 0) {
-						this.x += radius_distance;
-						this.y += radius_distance;
+					//this.dy = -this.dy;
+					element.dy = -element.dy;
+				} else {
+					if (distanceX < 0) {
+						this.x -= distance;
+					} else {
+						this.x += distance;
 					}
-
-					//uncomment the following line for making the objects stop when colision
-					//this.dx = element.dx = this.dy = element.dy = 0
+					//this.dx = -this.dx;
+					element.dx = -element.dx;
 				}
+
+				if (distanceX == 0 && distanceY == 0) {
+					this.x += radius_distance;
+					this.y += radius_distance;
+				}
+
+				//uncomment the following line for making the objects stop when colision
+				//this.dx = element.dx = this.dy = element.dy = 0
 			}
 		});
 	}
@@ -632,61 +600,133 @@ class object_contructor {
 
 //classes objects and buttons
 
-
 //toggles functions
-change_toggle_all = () => { return lines_toggle = !lines_toggle }
-change_toggle_square = () => { return square_toggle = !square_toggle }
-change_toggle_circle = () => { return circle_toggle = !circle_toggle }
+change_toggle_all = () => {
+	return (lines_toggle = !lines_toggle);
+};
+change_toggle_square = () => {
+	return (square_toggle = !square_toggle);
+};
+change_toggle_circle = () => {
+	return (circle_toggle = !circle_toggle);
+};
 
-let $all_line = document.getElementById("show_all_line").onclick = () => { change_toggle_all() }
-let $square_line = document.getElementById("show_square_line").onclick = () => { change_toggle_square() }
-let $circle_line = document.getElementById("show_circle_line").onclick = () => { change_toggle_circle() }
+let $all_line = (document.getElementById("show_all_line").onclick = () => {
+	change_toggle_all();
+});
+let $square_line = (document.getElementById("show_square_line").onclick =
+	() => {
+		change_toggle_square();
+	});
+let $circle_line = (document.getElementById("show_circle_line").onclick =
+	() => {
+		change_toggle_circle();
+	});
 
 //button tha create a luminous object on the canvas
 //create and destroy light
-let $create_light = document.getElementById("create_light").onclick = () => { generate_random_objects("circle", true) }
-let $delete_light = document.getElementById("delete_light").onclick = () => { light_sources.pop() }
+let $create_light = (document.getElementById("create_light").onclick = () => {
+	generate_random_objects("circle", true);
+});
+let $delete_light = (document.getElementById("delete_light").onclick = () => {
+	light_sources.pop();
+});
 
 //create and destroy an circle
-let $create_circle = document.getElementById("create_circle").onclick = () => { generate_random_objects("circle") }
-let $delete_circle = document.getElementById("delete_circle").onclick = () => { circles.pop() };
+let $create_circle = (document.getElementById("create_circle").onclick = () => {
+	generate_random_objects("circle");
+});
+let $delete_circle = (document.getElementById("delete_circle").onclick = () => {
+	circles.pop();
+});
 
 //create and destroy a square
-let $create_square = document.getElementById("create_square").onclick = () => { generate_random_objects("square") }
-let $delete_square = document.getElementById("delete_square").onclick = () => { squares.pop() }
-
+let $create_square = (document.getElementById("create_square").onclick = () => {
+	generate_random_objects("square");
+});
+let $delete_square = (document.getElementById("delete_square").onclick = () => {
+	squares.pop();
+});
 
 //make the objects stop and move again and for cleaning the canvas and outline toggle
-let $stop = document.getElementById("stop").onclick = () => { stop_movement() }
-let $start = document.getElementById("start").onclick = () => { start_movement() }
-let $clear_canvas = document.getElementById("clear_all").onclick = () => { clear([squares, circles, light_sources]) }
+let $stop = (document.getElementById("stop").onclick = () => {
+	stop_movement();
+});
+let $start = (document.getElementById("start").onclick = () => {
+	start_movement();
+});
+let $clear_canvas = (document.getElementById("clear_all").onclick = () => {
+	clear([squares, circles, light_sources]);
+});
 
-let $show_outline = document.getElementById("show_outline").onclick = () => {
+let $show_outline = (document.getElementById("show_outline").onclick = () => {
 	new_list = squares.concat(circles, light_sources);
-	new_list.forEach(i => { i.outline = !i.outline })
-}
-
+	new_list.forEach((i) => {
+		i.outline = !i.outline;
+	});
+});
 
 //controlables by mouse
-let $create_my_circle = document.getElementById("create_my_circle").onclick = () => {
-	let my_circle = new object_contructor("circle", mouseX, mouseY, random_speed, "black", my_circle_radius);
-	my_circle.random_color();
-	circles.push(my_circle);
-}
-let $crete_my_square = document.getElementById("create_my_square").onclick = () => {
-	let my_square = new object_contructor("square", mouseX, mouseY, random_speed, "black", 0, 80, 80);
-	my_square.random_color();
-	squares.push(my_square);
-}
-let $create_my_light = document.getElementById('create_my_light').onclick = () => {
-	let my_light = new object_contructor("circle", mouseX, mouseY, 0, "white", 30);
-	my_light.light_souce = true;
-	light_sources.push(my_light);
-}
+let $create_my_circle = (document.getElementById("create_my_circle").onclick =
+	() => {
+		let my_circle = new object_contructor(
+			"circle",
+			mouseX,
+			mouseY,
+			random_speed,
+			"black",
+			my_circle_radius
+		);
+		my_circle.random_color();
+		circles.push(my_circle);
+	});
+let $crete_my_square = (document.getElementById("create_my_square").onclick =
+	() => {
+		let my_square = new object_contructor(
+			"square",
+			mouseX,
+			mouseY,
+			random_speed,
+			"black",
+			0,
+			80,
+			80
+		);
+		my_square.random_color();
+		squares.push(my_square);
+	});
+let $create_my_light = (document.getElementById("create_my_light").onclick =
+	() => {
+		let my_light = new object_contructor(
+			"circle",
+			mouseX,
+			mouseY,
+			0,
+			"white",
+			30
+		);
+		my_light.light_souce = true;
+		light_sources.push(my_light);
+	});
 
-
-let my_square = new object_contructor("square", 0, 0, Math.floor(Math.random() * max_speed) + 1, "black", null, 100, 100);
-let my_circle = new object_contructor("circle", 0, 0, Math.floor(Math.random() * max_speed) + 1, "black", my_circle_radius);
+let my_square = new object_contructor(
+	"square",
+	0,
+	0,
+	Math.floor(Math.random() * max_speed) + 1,
+	"black",
+	null,
+	100,
+	100
+);
+let my_circle = new object_contructor(
+	"circle",
+	0,
+	0,
+	Math.floor(Math.random() * max_speed) + 1,
+	"black",
+	my_circle_radius
+);
 let my_light = new object_contructor("circle", mouseX, mouseY, 0, "white", 20);
 
 //let my_circle, my_light, my_square;
@@ -694,51 +734,64 @@ let my_light = new object_contructor("circle", mouseX, mouseY, 0, "white", 20);
 //functions here
 
 generate_random_objects = (object_type, light_property = false) => {
-
 	if (object_type === "square") {
-
 		let random_x = Math.floor(Math.random() * canvas.width) + 1;
 		let random_y = Math.floor(Math.random() * canvas.height) + 1;
 
 		let random_width = Math.floor(Math.random() * max_size) + 1;
-		if (random_width < 20) { random_width = 20; }
+		if (random_width < 20) {
+			random_width = 20;
+		}
 
 		let random_height = Math.floor(Math.random() * max_size) + 1;
-		if (random_height < 20) { random_height = 20 }
+		if (random_height < 20) {
+			random_height = 20;
+		}
 
 		let random_speed = Math.floor(Math.random() * max_speed) + 1;
 
-		let random_square = new object_contructor("square", random_x, random_y, random_speed, "black", null, random_width, random_height);
+		let random_square = new object_contructor(
+			"square",
+			random_x,
+			random_y,
+			random_speed,
+			"black",
+			null,
+			random_width,
+			random_height
+		);
 		random_square.random_color();
 		squares.push(random_square);
-
 	}
 	if (object_type === "circle") {
-
 		let random_x = Math.floor(Math.random() * canvas.width) + 1;
 		let random_y = Math.floor(Math.random() * canvas.height) + 1;
 
 		let random_radius = Math.floor(Math.random() * max_size) + 1;
-		if (random_radius < 20) { random_radius = 20 }
+		if (random_radius < 20) {
+			random_radius = 20;
+		}
 
 		let random_speed = Math.floor(Math.random() * max_speed) + 1;
 
-		let random_circle = new object_contructor("circle", random_x, random_y, random_speed, "purple", random_radius);
+		let random_circle = new object_contructor(
+			"circle",
+			random_x,
+			random_y,
+			random_speed,
+			"purple",
+			random_radius
+		);
 		random_circle.random_color();
 
 		if (light_property === true) {
-
 			random_circle.light_souce = true;
 			light_sources.push(random_circle);
-
 		} else {
-
 			circles.push(random_circle);
-
 		}
 	}
-}
-
+};
 
 function update_object(object_type, element, light = false) {
 	element.update();
@@ -749,7 +802,14 @@ function update_object(object_type, element, light = false) {
 		element.circle_response(light_sources);
 
 		if (light === true) {
-			my_light = new object_contructor("circle", mouseX, mouseY, 0, "white", 30);
+			my_light = new object_contructor(
+				"circle",
+				mouseX,
+				mouseY,
+				0,
+				"white",
+				30
+			);
 			my_light.light_souce = true;
 			light_sources[0] = my_light;
 		}
@@ -765,14 +825,25 @@ function update_object(object_type, element, light = false) {
 function update_position(object_type, circle) {
 	//stop the movement
 	if (object_type === "circle") {
-		if (circle.x - circle.radius <= 0) { (circle.x = circle.radius + 1) }
-		if (circle.y - circle.radius <= 0) { (circle.y = circle.radius + 1) }
-		if (circle.x + circle.radius >= canvas.width) { (circle.x = canvas.width - circle.radius - 1) }
-		if (circle.y + circle.radius >= canvas.height) { (circle.y = canvas.height - circle.radius - 1) }
-	}
-	else if (object_type === "square") {
-		if (square.x <= 0) { (square.x = 1), (square.dx = -square.dx); }
-		if (square.y <= 0) { (square.y = 1), (square.dy = -square.dy); }
+		if (circle.x - circle.radius <= 0) {
+			circle.x = circle.radius + 1;
+		}
+		if (circle.y - circle.radius <= 0) {
+			circle.y = circle.radius + 1;
+		}
+		if (circle.x + circle.radius >= canvas.width) {
+			circle.x = canvas.width - circle.radius - 1;
+		}
+		if (circle.y + circle.radius >= canvas.height) {
+			circle.y = canvas.height - circle.radius - 1;
+		}
+	} else if (object_type === "square") {
+		if (square.x <= 0) {
+			(square.x = 1), (square.dx = -square.dx);
+		}
+		if (square.y <= 0) {
+			(square.y = 1), (square.dy = -square.dy);
+		}
 
 		if (square.x + square.width >= canvas.width) {
 			(square.x = canvas.width - square.width - 1), (square.dx = -square.dx);
@@ -783,63 +854,69 @@ function update_position(object_type, circle) {
 	}
 }
 
-
 function clear(list) {
 	let sizes = [];
-	for (i of list) { sizes.push(i.length) }
+	for (i of list) {
+		sizes.push(i.length);
+	}
 	let condition_loop;
-	sizes.forEach(i => { if (i != 0) { condition_loop = true } });
-	console.log(condition_loop)
+	sizes.forEach((i) => {
+		if (i != 0) {
+			condition_loop = true;
+		}
+	});
+	console.log(condition_loop);
 
 	if (condition_loop) {
-
 		for (var i = 0; i < Math.max(...sizes) + 1; i++) {
-			list.forEach(i => {
-				i.pop()
-			})
+			list.forEach((i) => {
+				i.pop();
+			});
 		}
-	} else { return }
+	} else {
+		return;
+	}
 }
 
 function draw_lines(list) {
 	for (element of list) {
 		element.draw_line(list);
-	};
+	}
 }
-
-
 
 function stop_movement() {
 	for (square of squares) {
 		square.dx = square.dy = 0;
-	} for (circle of circles) {
+	}
+	for (circle of circles) {
 		circle.dx = circle.dy = 0;
-	} for (circle of light_sources) {
+	}
+	for (circle of light_sources) {
 		circle.dx = circle.dy = 0;
 	}
 }
 
 function start_movement() {
-	let len1 = circles.length
-	let len2 = squares.length
-	let len3 = light_sources.length
+	let len1 = circles.length;
+	let len2 = squares.length;
+	let len3 = light_sources.length;
 	for (element of circles) {
-		let random_speed = Math.floor(Math.random() * max_speed) + 1
-		element.dx = element.dy = random_speed
+		let random_speed = Math.floor(Math.random() * max_speed) + 1;
+		element.dx = element.dy = random_speed;
 	}
 	for (element of squares) {
-		let random_speed = Math.floor(Math.random() * max_speed) + 1
-		element.dx = element.dy = random_speed
+		let random_speed = Math.floor(Math.random() * max_speed) + 1;
+		element.dx = element.dy = random_speed;
 	}
 	for (element of light_sources) {
-		let random_speed = Math.floor(Math.random() * max_speed) + 1
-		element.dx = element.dy = random_speed
+		let random_speed = Math.floor(Math.random() * max_speed) + 1;
+		element.dx = element.dy = random_speed;
 	}
 }
 
 function render_objects(squares, circles) {
-	squares.forEach(i => {
-		i.forEach(element => {
+	squares.forEach((i) => {
+		i.forEach((element) => {
 			for (c of squares) {
 				element.square_response(c);
 			}
@@ -848,12 +925,12 @@ function render_objects(squares, circles) {
 			}
 			element.update();
 		});
-	})
+	});
 
-	circles.forEach(i => {
-		i.forEach(element => {
+	circles.forEach((i) => {
+		i.forEach((element) => {
 			for (b of circles) {
-				element.circle_response(b)
+				element.circle_response(b);
 			}
 			element.update();
 		});
@@ -868,14 +945,27 @@ function render_light(list) {
 
 		switch (element.type) {
 			case "circle":
-				grd = ctx.createRadialGradient(element.x, element.y, element.radius * element.mass, element.x, element.y, canvas.width * 0.5);
+				grd = ctx.createRadialGradient(
+					element.x,
+					element.y,
+					element.radius * element.mass,
+					element.x,
+					element.y,
+					canvas.width * 0.5
+				);
 				//grd = ctx.createRadialGradient(element.x, element.y, element.radius * 0.5, element.x, element.y, element.light_constant);
 				break;
 			case "square":
-				grd = ctx.createRadialGradient(element.x, element.y, (element.width + element.height) * 0.5, element.x, element.y, canvas.width * 0.5);
+				grd = ctx.createRadialGradient(
+					element.x,
+					element.y,
+					(element.width + element.height) * 0.5,
+					element.x,
+					element.y,
+					canvas.width * 0.5
+				);
 				//grd = ctx.createRadialGradient(element.x, element.y, (element.width + element.height) * 0.5, element.x, element.y, (element.width + element.height) * 5);
 				break;
-
 		}
 		grd.addColorStop(0, element.color);
 		grd.addColorStop(0.3, $color_picker.value);
@@ -888,15 +978,13 @@ function render_light(list) {
 		if (element.type === "circle") {
 			element.circle_response(light_sources);
 			element.circle_response(circles);
-		}
-		else {
-			element.square_response(squares)
+		} else {
+			element.square_response(squares);
 			element.circle_square_response(circles);
 			element.circle_square_response(light_sources);
 		}
 		element.update();
 		//element.random_color();
-		//});
 	}
 }
 
@@ -905,21 +993,25 @@ function render_light(list) {
 //}
 
 function game() {
-
 	canvas.style.background = $color_picker.value;
 	let new_list = squares.concat(circles, light_sources);
 	//console.log(new_list);
 
-	render_light(light_sources)
+	render_light(light_sources);
 	//render_light(squares)
-	//update_object("circle", my_light, true)
+	update_object("circle", my_light, true);
 
-	if (lines_toggle === true) { draw_lines(new_list) }
-	if (circle_toggle === true) { draw_lines(circles) }
-	if (square_toggle === true) { draw_lines(squares) }
+	if (lines_toggle === true) {
+		draw_lines(new_list);
+	}
+	if (circle_toggle === true) {
+		draw_lines(circles);
+	}
+	if (square_toggle === true) {
+		draw_lines(squares);
+	}
 
 	render_objects([squares], [circles, light_sources]);
-
 }
 
 let update_frame = () => {
