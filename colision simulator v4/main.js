@@ -1,9 +1,9 @@
 //variables here
 
 let update_game_time = 1000 / 60;
-let max_size = 100;
+let max_size = 10; // 100
 let max_quantity = 2;
-let my_circle_radius = 20;
+let my_circle_radius = 10; // 20
 let max_speed = 12;
 let circles = [];
 let squares = [];
@@ -96,7 +96,7 @@ class object_contructor {
 		this.grd = this.color;
 		this.linew_width = 3;
 		this.shadow_color = "black";
-		this.shadow_blur = 20;
+		this.shadow_blur = 20; //20
 		this.outline = false;
 
 		//this.image_path = "792632.png";
@@ -152,12 +152,17 @@ class object_contructor {
 	draw(ctx) {
 		let element;
 
-		ctx.shadowBlur = this.shadow_blur;
-		ctx.lineWidth = this.linew_width;
+		if (this.light_souce === false) {
 
-		this.light_souce === true
-			? (ctx.shadowColor = this.color)
-			: (ctx.shadowColor = this.shadow_color);
+			ctx.shadowBlur = this.shadow_blur;
+			ctx.lineWidth = this.linew_width;
+			ctx.shadowColor = this.shadow_color;
+
+		} else {
+			ctx.shadowBlur = 100;
+			ctx.lineWidth = this.linew_width;
+			ctx.shadowColor = null;
+		}
 
 		switch (this.type) {
 			case "square":
@@ -263,9 +268,15 @@ class object_contructor {
 	}
 
 	display_shadow(element) {
+
+		if (this.light_souce === true) {
+			return
+		}
+
 		let distanceX = this.centerX - element.centerX;
 		let distanceY = this.centerY - element.centerY;
 
+		
 		if (this.type === "square") {
 			if (distanceY >= this.half_sizeH) {
 				(distanceY = this.half_sizeH);
@@ -282,11 +293,9 @@ class object_contructor {
 		} else {
 			if (distanceY >= this.radius) {
 				distanceY = this.radius;
-				console.log(distanceY)
 			}
 			else if (distanceY <= -this.radius) {
 				distanceY = -this.radius;
-				console.log(distanceY)
 			}
 			if (distanceX >= this.radius) {
 				distanceX = this.radius;
@@ -404,7 +413,7 @@ class object_contructor {
 		let radius_distance = this.radius + circle.radius;
 
 		return radius_distance * radius_distance >=
-		distanceX * distanceX + distanceY * distanceY ? true : false;
+			distanceX * distanceX + distanceY * distanceY ? true : false;
 	}
 
 	//don't really know if this here works in practice but, it used for return the closes point in this object
