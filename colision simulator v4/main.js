@@ -1,9 +1,9 @@
 //variables here
 
 let update_game_time = 1000 / 60;
-let max_size = 10; // 100
+let max_size = 100; // 100
 let max_quantity = 2;
-let my_circle_radius = 10; // 20
+let my_circle_radius = 20; // 20
 let max_speed = 12;
 let circles = [];
 let squares = [];
@@ -82,22 +82,23 @@ class object_contructor {
 		//type of object
 		this.type = type;
 		this.light_souce = false;
+		this.enable_shadows = true;
 
 		//speed and positin atributes
 		this.x = x;
 		this.y = y;
 		this.speed = speed;
-		this.text = 0;
+		this.text = 0; //0
 		this.dx = 2 * this.speed;
 		this.dy = this.speed;
 
 		//miscelaneous
 		this.color = color;
 		this.grd = this.color;
-		this.linew_width = 3;
+		this.linew_width = 3; //3
 		this.shadow_color = "black";
 		this.shadow_blur = 20; //20
-		this.outline = false;
+		this.outline = false; //false
 
 		//this.image_path = "792632.png";
 
@@ -152,16 +153,18 @@ class object_contructor {
 	draw(ctx) {
 		let element;
 
-		if (this.light_souce === false) {
+		if (this.enable_shadows === true) {
+			if (this.light_souce === false) {
 
-			ctx.shadowBlur = this.shadow_blur;
-			ctx.lineWidth = this.linew_width;
-			ctx.shadowColor = this.shadow_color;
+				ctx.shadowBlur = this.shadow_blur;
+				ctx.lineWidth = this.linew_width;
+				ctx.shadowColor = this.shadow_color;
 
-		} else {
-			ctx.shadowBlur = 100;
-			ctx.lineWidth = this.linew_width;
-			ctx.shadowColor = null;
+			} else {
+				ctx.shadowBlur = 100;
+				ctx.lineWidth = this.linew_width;
+				ctx.shadowColor = null;
+			}
 		}
 
 		switch (this.type) {
@@ -189,7 +192,9 @@ class object_contructor {
 						this.grd.addColorStop(0.5, "black");
 						this.grd.addColorStop(1, "black");
 
-						this.display_shadow(element);
+						if (this.display_shadow === true) {
+							this.display_shadow(element);
+						}
 
 					} else {
 						this.grd = this.color;
@@ -236,7 +241,9 @@ class object_contructor {
 						this.grd.addColorStop(0.5, this.color);
 						this.grd.addColorStop(1, "black");
 
-						this.display_shadow(element);
+						if (this.enable_shadows === true) {
+							this.display_shadow(element);
+						}
 
 					} else {
 						this.grd = this.color;
@@ -276,7 +283,7 @@ class object_contructor {
 		let distanceX = this.centerX - element.centerX;
 		let distanceY = this.centerY - element.centerY;
 
-		
+
 		if (this.type === "square") {
 			if (distanceY >= this.half_sizeH) {
 				(distanceY = this.half_sizeH);
@@ -620,6 +627,8 @@ change_toggle_circle = () => {
 	return (circle_toggle = !circle_toggle);
 };
 
+let toggle_shadow = document.getElementById("toggle_shadows")
+
 let $all_line = (document.getElementById("show_all_line").onclick = () => {
 	change_toggle_all();
 });
@@ -803,7 +812,7 @@ generate_random_objects = (object_type, light_property = false) => {
 };
 
 function update_object(object_type, element, light = false) {
-	element.update();
+	
 
 	if (object_type === "circle") {
 		element.circle_square_response(squares);
@@ -829,36 +838,37 @@ function update_object(object_type, element, light = false) {
 	}
 
 	update_position(object_type, element);
+	element.update();
 }
 
-function update_position(object_type, circle) {
+function update_position(object_type, object) {
 	//stop the movement
 	if (object_type === "circle") {
-		if (circle.x - circle.radius <= 0) {
-			circle.x = circle.radius + 1;
+		if (object.x - object.radius <= 0) {
+			object.x = object.radius + 1;
 		}
-		if (circle.y - circle.radius <= 0) {
-			circle.y = circle.radius + 1;
+		if (object.y - object.radius <= 0) {
+			object.y = object.radius + 1;
 		}
-		if (circle.x + circle.radius >= canvas.width) {
-			circle.x = canvas.width - circle.radius - 1;
+		if (object.x + object.radius >= canvas.width) {
+			object.x = canvas.width - object.radius - 1;
 		}
-		if (circle.y + circle.radius >= canvas.height) {
-			circle.y = canvas.height - circle.radius - 1;
+		if (object.y + object.radius >= canvas.height) {
+			object.y = canvas.height - object.radius - 1;
 		}
 	} else if (object_type === "square") {
-		if (square.x <= 0) {
-			(square.x = 1), (square.dx = -square.dx);
+		if (object.x <= 0) {
+			(object.x = 1), (object.dx = -object.dx);
 		}
-		if (square.y <= 0) {
-			(square.y = 1), (square.dy = -square.dy);
+		if (object.y <= 0) {
+			(object.y = 1), (object.dy = -object.dy);
 		}
 
-		if (square.x + square.width >= canvas.width) {
-			(square.x = canvas.width - square.width - 1), (square.dx = -square.dx);
+		if (object.x + object.width >= canvas.width) {
+			(object.x = canvas.width - object.width - 1), (object.dx = -object.dx);
 		}
-		if (square.y + square.height >= canvas.height) {
-			(square.y = canvas.height - square.height - 1), (square.dy = -square.dy);
+		if (object.y + object.height >= canvas.height) {
+			(object.y = canvas.height - object.height - 1), (object.dy = -object.dy);
 		}
 	}
 }
@@ -874,7 +884,6 @@ function clear(list) {
 			condition_loop = true;
 		}
 	});
-	console.log(condition_loop);
 
 	if (condition_loop) {
 		for (var i = 0; i < Math.max(...sizes) + 1; i++) {
@@ -1008,7 +1017,7 @@ function game() {
 
 	render_light(light_sources);
 	//render_light(squares)
-	update_object("circle", my_light, true);
+	//update_object("circle", my_light, true);
 
 	if (lines_toggle === true) {
 		draw_lines(new_list);
@@ -1018,6 +1027,15 @@ function game() {
 	}
 	if (square_toggle === true) {
 		draw_lines(squares);
+	}
+
+	toggle_shadow.onclick = () => {
+		for (i of squares) {
+			i.enable_shadows = !i.enable_shadows
+		}
+		for (i of circles) {
+			i.enable_shadows = !i.enable_shadows
+		}
 	}
 
 	render_objects([squares], [circles, light_sources]);
