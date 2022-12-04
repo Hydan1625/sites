@@ -126,7 +126,7 @@ class object_contructor {
 			this.wall_absortion_force = 0.89;
 		}
 
-		this.gravity_force = this.mass * 0.01
+		this.gravity_force = this.mass * 0.001
 
 		//this.speed = this.speed * this.mass
 	}
