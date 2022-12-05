@@ -85,7 +85,7 @@ class object_contructor {
 		this.light_souce = false;
 		this.enable_shadows = true;
 
-		//speed and positin atributes
+		//speed and position atributes
 		this.x = x;
 		this.y = y;
 		this.speed = speed;
@@ -114,6 +114,8 @@ class object_contructor {
 			this.centerX = this.x + this.width * 0.5;
 			this.centerY = this.y + this.height * 0.5;
 			this.wall_absortion_force = 0.85;
+			this.gravity_force = this.mass * 0.001;
+
 
 		} else if (this.type == "circle") {
 			this.radius = radius;
@@ -124,9 +126,10 @@ class object_contructor {
 			this.centerX = this.x;
 			this.centerY = this.y;
 			this.wall_absortion_force = 0.89;
+			this.gravity_force = this.mass * 0.05;
 		}
 
-		this.gravity_force = this.mass * 0.001
+		
 
 		//this.speed = this.speed * this.mass
 	}
@@ -385,6 +388,7 @@ class object_contructor {
 
 				this.centerX = this.x;
 				this.centerY = this.y;
+				break;
 		}
 
 		let minimum_value = 0.1;
@@ -410,16 +414,61 @@ class object_contructor {
 		//this cost can be altered to make the colision more or less efective
 
 		/* cool effect
-		let cost = 0.5;
-		let initial_dx = this.dx, initial_dy = this.dy;
-		this.dx = obj.dx * cost;
-		obj.dx = initial_dx * cost;
-		this.dy = obj.dy * cost;
-		obj.dy = initial_dy * cost;
+		let cost = 0.5;let initial_dx = this.dx, initial_dy = this.dy;this.dx = obj.dx * cost;obj.dx = initial_dx * cost;this.dy = obj.dy * cost;obj.dy = initial_dy * cost;
 		*/
 
 		//cool values for the cost:
 		// 0.5, 0.69, 0.82 and 0.95
+
+		/* base
+		let cost = 0.82;
+		let initial_dx = this.dx, initial_dy = this.dy;
+		
+		if (this.dx < 0 && obj.dx > 0 || this.dx > 0 && obj.dx < 0) {
+			this.dx -= (this.dx - obj.dx) * cost;
+			obj.dx -= (initial_dx - obj.dx) * cost;
+		}
+		else {
+			this.dx += (-obj.dx - this.dx) * cost;
+			obj.dx += (-initial_dx - obj.dx) * cost;
+		}
+
+		if (this.dy < 0 && obj.dy > 0 || this.dy > 0 && obj.dy < 0) {
+			this.dy -= (this.dy - obj.dy) * cost;
+			obj.dy -= (initial_dy - obj.dy) * cost;
+		}
+
+		else {
+			this.dy += (-obj.dy - this.dy) * cost;
+			obj.dy += (-initial_dy - obj.dy) * cost;
+		}
+		*/
+		
+		let cost = 0.82;
+		let initial_dx = this.dx, initial_dy = this.dy;
+		
+		if (this.dx < 0 && obj.dx > 0 || this.dx > 0 && obj.dx < 0) {
+			this.dx -= (this.dx + obj.dx) * cost;
+			obj.dx -= (initial_dx + obj.dx) * cost;
+		}
+		else {
+			this.dx += (-obj.dx - this.dx) * cost;
+			obj.dx += (-initial_dx - obj.dx) * cost;
+		}
+
+		if (this.dy < 0 && obj.dy > 0 || this.dy > 0 && obj.dy < 0) {
+			this.dy -= (this.dy + obj.dy) * cost;
+			obj.dy -= (initial_dy + obj.dy) * cost;
+		}
+
+		else {
+			this.dy += (-obj.dy - this.dy) * cost;
+			obj.dy += (-initial_dy - obj.dy) * cost;
+		}
+		
+		//this.dx *= cost;this.dx += obj.dx * cost;this.dy *= cost;this.dy += obj.dy * cost;obj.dx *= cost;obj.dx += this.dx;obj.dy *= cost;obj.dy += this.dy;
+
+/*
 		let cost = 0.82;
 		let initial_dx = this.dx, initial_dy = this.dy;
 
@@ -441,6 +490,8 @@ class object_contructor {
 			this.dy = -obj.dy * cost;
 			obj.dy = -initial_dy * cost;
 		}
+		*/
+
 
 	}
 
