@@ -125,7 +125,8 @@ class object_contructor {
 
 			this.centerX = this.x;
 			this.centerY = this.y;
-			this.wall_absortion_force = 0.89;
+			// 0.6
+			this.wall_absortion_force = 0.4; // 0.6 0.7 0.35
 			this.gravity_force = this.mass * 0.05;
 		}
 
@@ -375,7 +376,7 @@ class object_contructor {
 				}
 				if (this.y - this.radius <= 0) {
 					(this.dy = this.speed), (this.y = 1 + this.radius);
-					this.dy *= this.wall_absortion_force;
+					this.dy *= this.wall_absortion_force;//**2  0.5
 				}
 				if (this.x + this.radius >= canvas.width) {
 					(this.dx = -this.speed), (this.x = canvas.width - this.radius - 1);
@@ -383,7 +384,7 @@ class object_contructor {
 				}
 				if (this.y + this.radius >= canvas.height) {
 					(this.dy = -this.speed), (this.y = canvas.height - this.radius - 1);
-					this.dy *= this.wall_absortion_force;
+					this.dy *= this.wall_absortion_force;//**2
 				}
 
 				this.centerX = this.x;
