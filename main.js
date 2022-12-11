@@ -116,7 +116,7 @@ class object_contructor {
 			this.centerX = this.x + this.width * 0.5;
 			this.centerY = this.y + this.height * 0.5;
 			this.wall_absortion_force = 0.85;
-			this.gravity_force = 0//this.mass * 0.001;
+			this.gravity_force = this.mass * 0.001;
 
 
 		} else if (this.type == "circle") {
@@ -129,7 +129,7 @@ class object_contructor {
 			this.centerY = this.y;
 			// 0.6
 			this.wall_absortion_force = 0.4; // 0.6 0.7 0.35
-			this.gravity_force = 0//this.mass * 0.05;
+			this.gravity_force = this.mass * 0.05;
 		}
 
 		//this.speed = this.speed * this.mass
