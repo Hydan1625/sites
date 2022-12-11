@@ -1158,7 +1158,7 @@ function game() {
 	}
 	*/
 
-	document.addEventListener("mousedown", () => { move_object(new_list) })
+	//document.addEventListener("mousedown", () => { move_object(new_list) })
 
 	render_objects([squares], [circles, light_sources]);
 }
