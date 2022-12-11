@@ -10,6 +10,7 @@ let squares = [];
 let light_sources = [];
 let copy = [];
 let new_list = [];
+let controled_object;
 
 let background_color = "#d87093";
 
@@ -100,6 +101,7 @@ class object_contructor {
 		this.shadow_color = "black";
 		this.shadow_blur = 20; //20
 		this.outline = false; //false
+		this.mouse_on_me = false;
 
 		//this.image_path = "792632.png";
 
@@ -336,6 +338,41 @@ class object_contructor {
 		};
 	}
 
+	mouse_on_here(e) {
+		mouseX = e.clientX;
+		mouseY = e.clientY;
+
+		switch (this.type) {
+			case "square":
+				if (mouseX <= this.x + this.width &&
+					mouseX >= this.x &&
+					mouseY <= this.y + this.height &&
+					mouseY >= this.y) {
+
+					this.x = mouseX;
+					this.y = mouseY;
+					this.mouse_on_me = true;
+					return true;
+
+				}
+
+				break;
+			case "circle":
+				if (mouseX <= this.x + this.radius &&
+					mouseX >= this.x - this.radius &&
+					mouseY <= this.y + this.radius &&
+					mouseY >= this.y - this.radius) {
+
+					this.x = mouseX;
+					this.y = mouseY;
+					this.mouse_on_me = true;
+					return true;
+
+				}
+				break;
+		}
+	}
+
 	//this makes the object move and prevent for leaving the screen
 	update() {
 		this.draw(ctx);
@@ -395,7 +432,7 @@ class object_contructor {
 		} else {
 			this.dx > 0 ? this.dx += -this.gravity_force : this.dx += this.gravity_force;
 		}
-		
+
 		if (this.dy > -minimum_value && this.dy < minimum_value) {
 			this.dy = 0
 		} else {
@@ -413,7 +450,7 @@ class object_contructor {
 		//cool values for the cost:
 		// 0.5, 0.69, 0.82 and 0.95
 
-		let cost = 1;
+		let cost = 0.95;
 		let initial_dx = this.dx, initial_dy = this.dy;
 
 		if (this.dx < 0 && obj.dx > 0 || this.dx > 0 && obj.dx < 0) {
@@ -421,8 +458,8 @@ class object_contructor {
 			obj.dx -= (initial_dx + obj.dx) * cost;
 		}
 		else {
-			this.dx += (obj.dx - this.dx) * cost;
-			obj.dx += (initial_dx - obj.dx) * cost;
+			this.dx += (-obj.dx - this.dx) * cost;  //this.dx += (-obj.dx - this.dx) * cost;
+			obj.dx += (-initial_dx - obj.dx) * cost; //obj.dx += (-initial_dx - obj.dx) * cost;
 		}
 
 		if (this.dy < 0 && obj.dy > 0 || this.dy > 0 && obj.dy < 0) {
@@ -431,8 +468,8 @@ class object_contructor {
 		}
 
 		else {
-			this.dy += (obj.dy - this.dy) * cost;
-			obj.dy += (initial_dy - obj.dy) * cost;
+			this.dy += (-obj.dy - this.dy) * cost; //this.dy += (-obj.dy - this.dy) * cost;
+			obj.dy += (-initial_dy - obj.dy) * cost; //(-initial_dy - obj.dy) * cost;
 		}
 	}
 
@@ -1077,50 +1114,24 @@ function render_light(list) {
 
 //not working yet {
 
+const move_object = (list) => {
 
+	document.addEventListener("mousedown", (e) => {
 
-const mouse_on_object = (obj) => {
-	mouseX = e.clientX;
-	mouseY = e.clientY;
-
-	switch (obj.type) {
-		case "square":
-			return mouseX <= obj.x + obj.width &&
-				mouseX >= obj.x &&
-				mouseY <= obj.y + obj.height &&
-				mouseY >= obj.y
-				? true
-				: false;
-			break;
-		case "circle":
-			return mouseX <= obj.x + obj.radius &&
-				mouseX >= obj.x - obj.radius &&
-				mouseY <= obj.y + obj.radius &&
-				mouseY >= obj.y - obj.radius
-				? true
-				: false;
-			break;
-	}
-
-}
-
-const move_object = (e, list) => {
-
-	mouseX = e.clientX;
-	mouseY = e.clientY;
-
-	for (i in list) {
-		if (mouse_on_object(i)) {
-			update_object(i.type, i, i.light_souce)
+		for (i of list) {
+			if (i.mouse_on_here(e)) {
+				controled_object = i;
+				update_object(controled_object.type, controled_object, controled_object.light_souce)
+			}
 		}
-	}
-
+	})
 }
 
 //}
 
+
 function game() {
-	
+
 	canvas.style.background = $color_picker.value;
 	let new_list = squares.concat(circles, light_sources);
 	//console.log(new_list);
@@ -1141,14 +1152,13 @@ function game() {
 
 	/*
 	toggle_shadow.onclick = () => {
-		for (i of squares) {
-			i.enable_shadows = !i.enable_shadows
-		}
-		for (i of circles) {
+		for (i of new_list) {
 			i.enable_shadows = !i.enable_shadows
 		}
 	}
 	*/
+
+	//document.addEventListener("mousedown", () => { move_object(new_list) })
 
 	render_objects([squares], [circles, light_sources]);
 }
