@@ -1129,7 +1129,7 @@ const move_object = (list) => {
 
 //}
 
-document.addEventListener("mousedown", () => { move_object(new_list) })
+
 
 function game() {
 
@@ -1159,7 +1159,7 @@ function game() {
 	}
 	*/
 
-	
+	document.addEventListener("mousedown", () => { move_object(new_list) })
 
 	render_objects([squares], [circles, light_sources]);
 }
