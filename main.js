@@ -1116,7 +1116,7 @@ function render_light(list) {
 
 const move_object = (list) => {
 
-	document.addEventListener("mousedown", (e) => {
+	document.addEventListener("mousemove", (e) => {
 
 		for (i of list) {
 			if (i.mouse_on_here(e)) {
@@ -1129,6 +1129,7 @@ const move_object = (list) => {
 
 //}
 
+document.addEventListener("mousedown", () => { move_object(new_list) })
 
 function game() {
 
@@ -1158,7 +1159,7 @@ function game() {
 	}
 	*/
 
-	document.addEventListener("mousedown", () => { move_object(new_list) })
+	
 
 	render_objects([squares], [circles, light_sources]);
 }
