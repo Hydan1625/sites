@@ -4,7 +4,7 @@ let update_game_time = 1000 / 60;
 let max_size = 100; // 100
 let max_quantity = 2;
 let my_circle_radius = 20; // 20
-let max_speed = 100; //12
+let max_speed = 12; //12
 
 let circles = [];
 let squares = [];
