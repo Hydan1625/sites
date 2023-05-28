@@ -107,8 +107,6 @@ let objectInCanvas = document.getElementById("objectsInCanvas");
 
 
 
-
-
 class object_contructor {
 	constructor(type, x, y, speed, color = "black", radius = null, width = null, height = null) {
 		//type of object
@@ -234,7 +232,7 @@ class object_contructor {
 						this.grd.addColorStop(0.5, "black");
 						this.grd.addColorStop(1, "black");
 
-						if (this.display_shadow === true) {
+						if (this.enable_shadows === true) {
 							this.display_shadow(element);
 						}
 
@@ -319,32 +317,18 @@ class object_contructor {
 		let distanceY = this.centerY - element.centerY;
 
 
-		if (this.type === "square") {
-			if (distanceY >= this.half_sizeH) {
-				(distanceY = this.half_sizeH);
-			}
-			else if (distanceY <= -this.half_sizeH) {
-				(distanceY = -this.half_sizeH);
-			}
-			if (distanceX >= this.half_sizeW) {
-				(distanceX = this.half_sizeW);
-			}
-			else if (distanceX <= -this.half_sizeW) {
-				(distanceX = -this.half_sizeW);
-			}
-		} else {
-			if (distanceY >= this.radius) {
-				distanceY = this.radius;
-			}
-			else if (distanceY <= -this.radius) {
-				distanceY = -this.radius;
-			}
-			if (distanceX >= this.radius) {
-				distanceX = this.radius;
-			}
-			else if (distanceX <= -this.radius) {
-				distanceX = -this.radius;
-			}
+
+		if (distanceY >= this.half_sizeH) {
+			(distanceY = this.half_sizeH);
+		}
+		else if (distanceY <= -this.half_sizeH) {
+			(distanceY = -this.half_sizeH);
+		}
+		if (distanceX >= this.half_sizeW) {
+			(distanceX = this.half_sizeW);
+		}
+		else if (distanceX <= -this.half_sizeW) {
+			(distanceX = -this.half_sizeW);
 		}
 
 		ctx.shadowOffsetX = distanceX;
@@ -1096,9 +1080,9 @@ const checks_toggles = () => {
 		update_object(my_square, false); //if light is true, then some value become infinite
 	}
 	if (!controling_circle && !controling_square && controling_light) {
-		update_object(my_light, true);	
+		update_object(my_light, true);
 	}
-	
+
 }
 
 function game() {
