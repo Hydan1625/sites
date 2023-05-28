@@ -14,7 +14,7 @@ canvas {
 
 .table {
     /* float: right; */
-    background-color: #d87093;
+    background-color: inherit;
     /* height: 100%; */
     border: 4px solid burlywood;
     border-radius: 10px;
@@ -24,7 +24,7 @@ canvas {
 td {
     /*border: 4px solid burlywood;
     border-radius: 10px;*/
-    background-color: palevioletred;
+    background-color: inherit;
 }
 
 button {
@@ -48,5 +48,14 @@ button {
     border-radius: 10px;
     display: block;
     width: 100%;
+    height: 4em;
     /* height: 260px; */
+}
+
+.objectCounter {
+    border: 2px solid white;
+    border-radius: 15px;
+    background-color: rgb(166, 157, 229);
+    font-family: sans-serif;
+    vertical-align: center;
 }
