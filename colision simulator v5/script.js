@@ -1033,10 +1033,7 @@ function render_light(list) {
 			element.circle_square_response(light_sources);
 		}
 		element.update();
-
-
 	}
-
 }
 
 //not working yet {
@@ -1064,7 +1061,7 @@ const checks_toggles = () => {
 
 
 	if (lines_toggle === true) {
-		draw_lines(new_list);
+		draw_lines(squares.concat(circles).concat(light_sources));
 	}
 	if (circle_toggle === true) {
 		draw_lines(circles);
