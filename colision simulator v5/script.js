@@ -227,8 +227,11 @@ class object_contructor {
 						//this.grd = ctx.createRadialGradient(element.x, element.y, element.radius * 0.5, element.x, element.y, element.light_constant * 2);
 
 						this.grd.addColorStop(0, "white");
+						this.grd.addColorStop(0.01, canvas.style.background);
+						//this.grd.addColorStop(0.04, canvas.style.background); //paints the object with a specific color
 						this.grd.addColorStop(0.05, element.color);
 						this.grd.addColorStop(0.15, this.color);
+						//this.grd.addColorStop(0.25, canvas.style.background); // to make the figure become transparent
 						this.grd.addColorStop(0.5, "black");
 						this.grd.addColorStop(1, "black");
 
@@ -270,7 +273,10 @@ class object_contructor {
 						//this.grd = ctx.createRadialGradient(element.x, element.y, element.radius, element.x, element.y, element.light_constant);
 
 						this.grd.addColorStop(0, "white");
+						this.grd.addColorStop(0.01, canvas.style.background);
+						//this.grd.addColorStop(0.14, canvas.style.background); // paints the object with the selected color
 						this.grd.addColorStop(0.15, element.color);
+						//this.grd.addColorStop(0.25, canvas.style.background); // to make the figure transparent
 						this.grd.addColorStop(0.5, this.color);
 						this.grd.addColorStop(1, "black");
 
@@ -1017,8 +1023,8 @@ function render_light(list) {
 				break;
 		}
 		grd.addColorStop(0, element.color);
-		grd.addColorStop(0.3, $color_picker.value);
-		grd.addColorStop(0.85, $color_picker.value);
+		grd.addColorStop(0.3, canvas.style.background);
+		grd.addColorStop(0.85, canvas.style.background);
 		grd.addColorStop(1, "black");
 
 		ctx.fillStyle = grd;
