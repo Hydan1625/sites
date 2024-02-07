@@ -895,7 +895,7 @@
             //response to the colision between squares
             //values must be a list containg the squares
             square_response(values) {
-                //colision_response_with_squares
+                //colision_response_with_squares -- FOR NOW IS PERFECT
 
                 values.forEach((element) => { //values.forEach((element) =>
 
@@ -928,11 +928,6 @@
             //can and will accept a list containg squares or circles
             //needs to be a list
             //it has two types of response, they are determined by the type of the object on wich is determined by this.type
-
-            handle_Colision_circle_square(element) {
-
-
-            }
 
             circle_square_response(list) {
 
@@ -1022,7 +1017,6 @@
                                 Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 
 
-
                             //distance fucking
                             //distance = distance.toFixed(2) //1
                             //distance += 1;
@@ -1047,17 +1041,6 @@
                                 //this.dx = -this.dx;
                                 this.dx = -this.dx;
                             }
-
-
-
-                            /*
-                            if (distanceX == 0) {
-                                this.x += 1;
-                            }
-                            if (distanceY == 0) {
-                                this.y += 1;
-                            }
-                            */
 
                             this.energy_lost(element);
 
