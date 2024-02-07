@@ -543,11 +543,7 @@
                 };
             }
 
-
-
             mouse_on_here() {
-
-
                 switch (this.type) {
                     case "square":
                         if (mouseX <= this.x + this.width &&
@@ -741,10 +737,13 @@
                     this.dx -= this.dx + obj.dx;
                     obj.dx += -obj.dx - this.dx
 
+                    if (!(this.type == "circle" && obj.type == "circle")) {
 
-                    //experimental
-                    this.dx -= obj.drag;
-                    obj.dx += this.drag;
+                        //experimental
+                        this.dx -= obj.drag;
+                        obj.dx += this.drag;
+
+                    }
 
                 }
 
@@ -752,14 +751,15 @@
                     this.dy -= this.dy + obj.dy;
                     obj.dy += -obj.dy - this.dy
 
-
-
-                    //experimental
-                    this.dy -= obj.drag;
-                    obj.dy += this.drag;
+                    if (!(this.type == "circle" && obj.type == "circle")) {
+                        //experimental
+                        this.dy -= obj.drag;
+                        obj.dy += this.drag;
+                    }
 
                 }
 
+                
                 if (this.dx >= 0 && obj.dx >= 0 || this.dx < 0 && obj.dx < 0) {
                     if (this.dx > obj.dx) {
                         this.dx -= this.dx - obj.dx
@@ -953,13 +953,13 @@
                             this.energy_lost(element);
 
                         }*/
-                        
+
                         switch (this.type) {
                             case "square":
                                 if (this.circle_rectangle_colision(element)) { // this.circle_rectangle_colision(element) || this.rectangle_circle_colision(element)
                                     let vectorX = this.centerX - element.centerX;
                                     let vectorY = this.centerY - element.centerY;
-                
+
                                     if (vectorY * vectorY > vectorX * vectorX) { //top and bottom
                                         element.y = vectorY > 0 ? (this.top - element.radius) - 1 : (this.bottom + element.radius) + 1;
                                         this.dy = -this.dy;
@@ -971,14 +971,14 @@
                                     }
                                     this.energy_lost(element);
                                 }
-                
+
                                 break; //
-                
+
                             case "circle":
                                 if (this.rectangle_circle_colision(element)) {
                                     let vectorX = this.centerX - element.x;
                                     let vectorY = this.centerY - element.y;
-                
+
                                     if (vectorY * vectorY > vectorX * vectorX) { // top and bottom
                                         element.y = vectorY > 0 ? (this.centerY - this.half_sizeH - element.height) - 1 : (this.centerY + this.half_sizeH) + 1;
                                         this.dy = -this.dy;
@@ -988,13 +988,13 @@
                                         this.dx = -this.dx;
                                         element.dx = -element.dx;
                                     }
-                
+
                                     this.energy_lost(element);
-                
+
                                     break;
                                 }
                         }
-                        
+
                     }
                 });
             }
