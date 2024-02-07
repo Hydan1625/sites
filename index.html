@@ -1026,9 +1026,9 @@
 
                             if (distanceY * distanceY >= distanceX * distanceX) {
                                 if (distanceY < 0) {
-                                    element.y += distance; //+
+                                    element.y += distance - this.gravity_force; //+
                                 } else {
-                                    element.y -= distance; //-
+                                    element.y -= distance + this.gravity_force; //-
                                 }
                                 //this.dy = -this.dy;
                                 this.dy = -this.dy;
