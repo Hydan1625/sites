@@ -315,10 +315,8 @@
                         this.id = this.color + Math.random() * 10000000;
                     }
                     id_list.push(this.id)
-                    console.log(id_list)
                 } else {
                     id_list.push(this.id)
-                    console.log(id_list)
                 }
 
 
@@ -356,7 +354,7 @@
                     this.centerX = this.x;
                     this.centerY = this.y;
                     // 0.6
-                    this.wall_absortion_force = 0.89; // 0.6 0.7 0.35
+                    this.wall_absortion_force = 0.92; // 0.6 0.7 0.35 0.89 - best
                     this.floor_absortion_force = 0.5; //0.5
                     this.gravity_force = this.mass * 0.005;
                 }
@@ -723,13 +721,19 @@
                 this.y += this.dy;
             }
 
-            energy_lost(obj) {
+            energy_lost(obj) { 
+
                 //this cost can be altered to make the colision more or less efective
 
                 //cool values for the cost:
                 // 0.5, 0.69, 0.82 and 0.95
 
                 let cost = 0.85;
+                if (this.type == "square" || obj.type == "square") {
+                    cost = 0.82
+                } else {
+                    cost = 0.85 //0.90
+                }
                 let initial_dx = this.dx;
                 let initial_dy = this.dy;
 
@@ -759,7 +763,7 @@
 
                 }
 
-                
+
                 if (this.dx >= 0 && obj.dx >= 0 || this.dx < 0 && obj.dx < 0) {
                     if (this.dx > obj.dx) {
                         this.dx -= this.dx - obj.dx
@@ -933,10 +937,10 @@
 
                 list.forEach((element) => {
                     //if (!(this.x == element.x && element.y == this.y && element.color == this.color && element.mass == this.mass)) {
-                    if (!(this.id == element.id)) {
+                    if (!(this.id == element.id)) {/*
 
 
-                         //FOR STACKABLE BALLS
+                        //FOR STACKABLE BALLS
                         if (this.circle_rectangle_colision(element)) { // this.circle_rectangle_colision(element) || this.rectangle_circle_colision(element)
                             let vectorX = this.centerX - element.centerX;
                             let vectorY = this.centerY - element.centerY;
@@ -952,9 +956,9 @@
                             }
                             this.energy_lost(element);
 
-                        }
+                        }*/
 
-                        /*
+                        
 
                         switch (this.type) {
                             case "square":
@@ -995,7 +999,7 @@
 
                                     break;
                                 }
-                        }*/
+                        }
 
                     }
                 });
@@ -1006,12 +1010,16 @@
             //cannot accept a list with squares
             circle_response(list) {
                 list.forEach((element) => {
-                    //if (!(this.x == element.x && element.y == this.y && element.color == this.color && element.mass == this.mass)) {
                     if (!(this.id == element.id)) {
 
                         if (this.circle_colision(element)) {
-                            let distanceX = this.x - element.x;
-                            let distanceY = this.y - element.y;
+
+                            let distanceX = (this.x - element.x) //* 0.95; // side // let distanceX = this.x - (element.x + 1); // side - sliding left + sliding left
+                            let distanceY = (this.y - element.y) //* 0.95; // horizontal
+
+                            /* funny correction with gravity but broken thus far
+                            let distanceX = this.x - (element.x + 1); // side
+                            let distanceY = this.y - (element.y - 1); // horizontal*/
 
                             let radius_distance = this.radius + element.radius;
                             let distance =
@@ -1020,17 +1028,17 @@
 
 
                             //distance fucking
-                            //distance = distance.toFixed(2) //1
+                            //distance = parseFloat(distance.toFixed()) //1
                             //distance += 1;
                             //distance *= 0.5 //0.5
                             //distance = Math.round(distance) + 0.00001;
-                            //distance > 0 ? distance += 1 : distance -= 1;
+                            //distance >= 0 ? distance += 3 : distance -= 3;
 
                             if (distanceY * distanceY >= distanceX * distanceX) {
                                 if (distanceY < 0) {
-                                    element.y += distance - this.gravity_force; //+
+                                    element.y += distance; //+
                                 } else {
-                                    element.y -= distance + this.gravity_force; //-
+                                    element.y -= distance; //-
                                 }
                                 //this.dy = -this.dy;
                                 this.dy = -this.dy;
@@ -1050,6 +1058,51 @@
                             //this.dx = element.dx = this.dy = element.dy = 0
                         }
                     }
+
+                    /*
+                if (!(this.id == element.id)) {
+
+                    if (this.circle_colision(element)) {
+                        let distanceX = this.x - element.x;
+                        let distanceY = this.y - element.y;
+
+                        let radius_distance = this.radius + element.radius;
+                        let distance =
+                            radius_distance -
+                            Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+
+                        //distance fucking
+                        //distance = distance.toFixed(2) //1
+                        //distance += 1;
+                        //distance *= 0.5 //0.5
+                        //distance = Math.round(distance) + 0.00001;
+                        //distance > 0 ? distance += 1 : distance -= 1;
+
+                        if (distanceY * distanceY >= distanceX * distanceX) {
+                            if (distanceY < 0) {
+                                element.y += distance - this.gravity_force; //+
+                            } else {
+                                element.y -= distance + this.gravity_force; //-
+                            }
+                            //this.dy = -this.dy;
+                            this.dy = -this.dy;
+                        } else {
+                            if (distanceX > 0) {
+                                element.x -= distance; //-
+                            } else {
+                                element.x += distance; //+
+                            }
+                            //this.dx = -this.dx;
+                            this.dx = -this.dx;
+                        }
+
+                        this.energy_lost(element);
+
+                        //uncomment the following line for making the objects stop when colision
+                        //this.dx = element.dx = this.dy = element.dy = 0
+                    }
+                }*/
                 });
             }
         }
